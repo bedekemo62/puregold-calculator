@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Packaging Checklist — Puregold Prints</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+  --gold-dim: rgba(201,168,76,0.15);
+  --dark: #080808;
+  --dark-2: #111111;
+  --dark-3: #181818;
+  --dark-4: #202020;
+  --white: #F5F3EE;
+  --grey: #888880;
+  --grey-light: #BDBDB5;
+  --red: #C0392B;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--dark);
+  color: var(--white);
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 100px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-glow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-glow-2 {
+  position: absolute;
+  bottom: -100px;
+  right: -100px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(201,168,76,0.3);
+  padding: 8px 20px;
+  margin-bottom: 48px;
+  animation: fadeUp 0.8s ease both;
+}
+
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.brand-badge span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.hero-eyebrow {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 2vw, 20px);
+  font-style: italic;
+  color: var(--grey-light);
+  margin-bottom: 20px;
+  animation: fadeUp 0.9s ease both;
+  animation-delay: 0.1s;
+}
+
+.hero h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(52px, 9vw, 110px);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -2px;
+  margin-bottom: 32px;
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.15s;
+}
+
+.hero h1 em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.hero h1 .outline {
+  -webkit-text-stroke: 1px rgba(245,243,238,0.3);
+  color: transparent;
+}
+
+.hero-sub {
+  font-size: clamp(14px, 1.5vw, 17px);
+  color: var(--grey-light);
+  max-width: 480px;
+  margin: 0 auto 56px;
+  font-weight: 400;
+  line-height: 1.8;
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.25s;
+}
+
+.hero-cta {
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.35s;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 20px 40px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold-light);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+.btn-primary svg { position: relative; z-index: 1; }
+
+.btn-arrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+.btn-primary:hover .btn-arrow { transform: translateX(4px); }
+
+.hero-proof {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  animation: fadeUp 1s ease both;
+  animation-delay: 0.45s;
+}
+
+.hero-proof-text {
+  font-size: 12px;
+  color: var(--grey);
+  letter-spacing: 1px;
+}
+
+.hero-proof-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255,255,255,0.1);
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 1.5s ease both;
+  animation-delay: 1s;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+  animation: scrollLine 2s ease infinite;
+}
+
+@keyframes scrollLine {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.scroll-text {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+/* ── SECTION COMMON ── */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  max-width: 40px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.5;
+}
+
+/* ── SOCIAL PROOF BAR ── */
+.proof-bar {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 24px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.proof-stat {
+  text-align: center;
+}
+
+.proof-stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  display: block;
+}
+
+.proof-stat-label {
+  font-size: 11px;
+  color: var(--grey);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.proof-bar-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.07);
+}
+
+/* ── WHAT YOU'LL GET ── */
+.preview-section {
+  padding: 100px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.preview-card {
+  background: var(--dark-2);
+  padding: 36px 32px;
+  border: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.preview-card:hover {
+  border-color: rgba(201,168,76,0.2);
+}
+
+.preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 0;
+  background: var(--gold);
+  transition: height 0.4s ease;
+}
+
+.preview-card:hover::before { height: 100%; }
+
+.preview-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 60px;
+  font-weight: 700;
+  color: rgba(201,168,76,0.1);
+  line-height: 1;
+  position: absolute;
+  top: 16px;
+  right: 24px;
+}
+
+.preview-icon {
+  font-size: 28px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.preview-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.preview-card p {
+  font-size: 13px;
+  color: var(--grey);
+  line-height: 1.7;
+}
+
+/* ── TESTIMONIALS ── */
+.testimonials-section {
+  padding: 100px 24px;
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.testimonials-inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.testimonials-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 56px;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.testimonials-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.testimonials-header h2 em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2px;
+}
+
+.testimonial-card {
+  background: var(--dark-3);
+  padding: 36px 32px;
+  border: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+}
+
+.testimonial-quote-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 80px;
+  line-height: 0.7;
+  color: var(--gold);
+  opacity: 0.3;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.testimonial-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.author-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--gold-dim);
+  border: 1px solid rgba(201,168,76,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.author-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  display: block;
+}
+
+.author-title {
+  font-size: 12px;
+  color: var(--grey);
+  display: block;
+  margin-top: 2px;
+}
+
+.stars {
+  color: var(--gold);
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+/* ── FEATURED WORK ── */
+.work-section {
+  padding: 100px 24px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 48px;
+}
+
+.work-item {
+  background: var(--dark-2);
+  padding: 40px 28px;
+  border: 1px solid rgba(255,255,255,0.04);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.work-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.work-item:hover::after { transform: scaleX(1); }
+
+.work-emoji {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.work-item h4 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.work-item p {
+  font-size: 12px;
+  color: var(--grey);
+  line-height: 1.6;
+}
+
+/* ── OPT-IN FORM ── */
+.optin-section {
+  padding: 100px 24px;
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.optin-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.optin-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.optin-inner h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 20px;
+}
+
+.optin-inner h2 em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.optin-inner p {
+  font-size: 16px;
+  color: var(--grey-light);
+  margin-bottom: 48px;
+  line-height: 1.8;
+  font-weight: 400;
+}
+
+.optin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.form-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.form-input {
+  background: var(--dark-3);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--white);
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  padding: 16px 20px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+}
+
+.form-input::placeholder { color: var(--grey); }
+
+.form-input:focus {
+  border-color: var(--gold);
+}
+
+.form-select {
+  background: var(--dark-3);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--white);
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  padding: 16px 20px;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.form-select:focus { border-color: var(--gold); }
+.form-select option { background: var(--dark-3); }
+
+.btn-submit {
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 20px 40px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.3s ease;
+  margin-top: 8px;
+}
+
+.btn-submit:hover { background: var(--gold-light); }
+
+.form-disclaimer {
+  font-size: 11px;
+  color: var(--grey);
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+/* ── SUCCESS STATE ── */
+.success-state {
+  display: none;
+  text-align: center;
+  padding: 60px 40px;
+  background: var(--dark-3);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+.success-state.show { display: block; }
+
+.success-icon {
+  font-size: 60px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.success-state h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--gold);
+}
+
+.success-state p {
+  font-size: 15px;
+  color: var(--grey-light);
+  margin-bottom: 32px;
+  line-height: 1.8;
+}
+
+.btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gold);
+  color: var(--dark);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 20px 40px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-download:hover { background: var(--gold-light); }
+
+/* ── PRIVACY NOTICE ── */
+.privacy-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 16px 20px;
+  margin-bottom: 32px;
+  font-size: 13px;
+  color: var(--grey-light);
+  line-height: 1.6;
+  text-align: left;
+}
+.privacy-notice .privacy-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.privacy-notice strong { color: var(--white); }
+
+.privacy-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(201,168,76,0.05);
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 14px 18px;
+  margin-top: 28px;
+  font-size: 12px;
+  color: var(--grey);
+  line-height: 1.6;
+  text-align: left;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 48px 24px;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+
+.footer-sub {
+  font-size: 12px;
+  color: var(--grey);
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  font-size: 12px;
+  color: var(--grey);
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover { color: var(--gold); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .proof-bar { gap: 24px; padding: 24px; }
+  .proof-bar-divider { display: none; }
+  .form-row { grid-template-columns: 1fr; }
+  .work-grid { grid-template-columns: 1fr; }
+  .testimonials-header { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+
+  <div class="brand-badge">
+    <div class="brand-dot"></div>
+    <span>Puregold Prints — Free Resource</span>
+  </div>
+
+  <p class="hero-eyebrow">For product brands, SMEs & manufacturers</p>
+
+  <h1>
+    Stop Wasting Money<br>
+    on <em>Bad Packaging</em>
+  </h1>
+
+  <p class="hero-sub">Get our free checklist — the exact 40-point system we use to ensure every packaging order is perfect before it goes to print.</p>
+
+  <div class="hero-cta">
+    <a href="#get-checklist" class="btn-primary">
+      <span>Get the Free Checklist</span>
+      <svg class="btn-arrow" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9h12M9 3l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="hero-proof">
+    <span class="hero-proof-text">✓ Completely free</span>
+    <div class="hero-proof-divider"></div>
+    <span class="hero-proof-text">✓ No spam</span>
+    <div class="hero-proof-divider"></div>
+    <span class="hero-proof-text">✓ Instant download</span>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar reveal">
+  <div class="proof-stat">
+    <span class="proof-stat-number">20+</span>
+    <span class="proof-stat-label">Years in Operation</span>
+  </div>
+  <div class="proof-bar-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-stat-number">500+</span>
+    <span class="proof-stat-label">Brands Served</span>
+  </div>
+  <div class="proof-bar-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-stat-number">3</span>
+    <span class="proof-stat-label">Countries — NG · KE · UG</span>
+  </div>
+  <div class="proof-bar-divider"></div>
+  <div class="proof-stat">
+    <span class="proof-stat-number">40</span>
+    <span class="proof-stat-label">Checklist Points</span>
+  </div>
+</div>
+
+<!-- WHAT YOU'LL GET -->
+<section class="preview-section">
+  <div class="section-label reveal">What's Inside</div>
+  <h2 class="reveal" style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);font-weight:700;line-height:1.1;max-width:600px;">
+    6 Sections. 40 Checks.<br><em style="color:var(--gold)">Zero Wasted Money.</em>
+  </h2>
+
+  <div class="preview-grid">
+    <div class="preview-card reveal">
+      <span class="preview-number">01</span>
+      <span class="preview-icon">🎨</span>
+      <h3>Design & Artwork Readiness</h3>
+      <p>CMYK, bleed, resolution, file formats — everything your artwork file must have before going to production.</p>
+    </div>
+    <div class="preview-card reveal">
+      <span class="preview-number">02</span>
+      <span class="preview-icon">🏷️</span>
+      <h3>Brand Identity Consistency</h3>
+      <p>How to make sure your packaging looks like your brand — every time, across every product and print run.</p>
+    </div>
+    <div class="preview-card reveal">
+      <span class="preview-number">03</span>
+      <span class="preview-icon">📐</span>
+      <h3>Dimensions & Fit</h3>
+      <p>The exact checks to run before ordering boxes, labels, and bags so nothing comes back the wrong size.</p>
+    </div>
+    <div class="preview-card reveal">
+      <span class="preview-number">04</span>
+      <span class="preview-icon">📋</span>
+      <h3>Required Product Information</h3>
+      <p>Barcodes, regulatory numbers, ingredients, expiry dates — what must be on your packaging by law.</p>
+    </div>
+    <div class="preview-card reveal">
+      <span class="preview-number">05</span>
+      <span class="preview-icon">🗂️</span>
+      <h3>Material & Finish Selection</h3>
+      <p>A comparison guide to help you pick the right paper, laminate, and finish for your product and market.</p>
+    </div>
+    <div class="preview-card reveal">
+      <span class="preview-number">06</span>
+      <span class="preview-icon">✅</span>
+      <h3>Before You Place Your Order</h3>
+      <p>The final 6-point check before you commit to any print run — the ones most brands skip and regret.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div class="testimonials-header">
+      <div>
+        <div class="section-label reveal">Client Testimonials</div>
+        <h2 class="reveal">What Brands<br>Say About <em>Us</em></h2>
+      </div>
+    </div>
+
+    <div class="testimonials-grid">
+      <!-- EDIT: Replace these testimonials with real ones from your clients -->
+      <div class="testimonial-card reveal">
+        <span class="stars">★★★★★</span>
+        <span class="testimonial-quote-mark">"</span>
+        <p class="testimonial-text">Puregold delivered our product boxes exactly as we designed them. The quality was outstanding and they shipped to Nairobi without any issues. We have reordered three times.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">A</div>
+          <div>
+            <span class="author-name">Amara K.</span>
+            <span class="author-title">Founder, Skincare Brand — Nairobi, Kenya</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <span class="stars">★★★★★</span>
+        <span class="testimonial-quote-mark">"</span>
+        <p class="testimonial-text">I was nervous about ordering packaging from Nigeria but Puregold made it seamless. The labels for our cosmetics line are beautiful and the turnaround was faster than expected.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">E</div>
+          <div>
+            <span class="author-name">Emmanuel O.</span>
+            <span class="author-title">CEO, FMCG Distributor — Lagos, Nigeria</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card reveal">
+        <span class="stars">★★★★★</span>
+        <span class="testimonial-quote-mark">"</span>
+        <p class="testimonial-text">Our brand looks completely different now. The packaging quality we get from Puregold has helped us compete with imported products on supermarket shelves here in Kampala.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">F</div>
+          <div>
+            <span class="author-name">Fatuma N.</span>
+            <span class="author-title">Brand Manager — Kampala, Uganda</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE DO -->
+<section class="work-section">
+  <div class="section-label reveal">Our Services</div>
+  <h2 class="reveal" style="font-family:'Cormorant Garamond',serif;font-size:clamp(36px,5vw,60px);font-weight:700;line-height:1.1;max-width:600px;margin-bottom:8px;">
+    Premium Printing &<br><em style="color:var(--gold)">Packaging Solutions</em>
+  </h2>
+  <p class="reveal" style="font-size:15px;color:var(--grey);max-width:500px;margin-top:16px;line-height:1.8;">From product labels to bulk cartons — we handle everything from design to delivery across Nigeria, Kenya and Uganda.</p>
+
+  <div class="work-grid">
+    <div class="work-item reveal">
+      <span class="work-emoji">📦</span>
+      <h4>Product Packaging</h4>
+      <p>Boxes, cartons, cake boxes, cosmetic packaging and more</p>
+    </div>
+    <div class="work-item reveal">
+      <span class="work-emoji">🏷️</span>
+      <h4>Labels & Stickers</h4>
+      <p>Waterproof labels, bottle labels, barcode & QR labels</p>
+    </div>
+    <div class="work-item reveal">
+      <span class="work-emoji">🛍️</span>
+      <h4>Branded Bags</h4>
+      <p>Paper bags, nylon bags, tote bags, shopping bags</p>
+    </div>
+    <div class="work-item reveal">
+      <span class="work-emoji">👕</span>
+      <h4>Branded Merchandise</h4>
+      <p>T-shirts, face caps, branded apparel and uniforms</p>
+    </div>
+    <div class="work-item reveal">
+      <span class="work-emoji">📄</span>
+      <h4>Print Materials</h4>
+      <p>Flyers, catalogues, notepads, magazines, handbills</p>
+    </div>
+    <div class="work-item reveal">
+      <span class="work-emoji">🌍</span>
+      <h4>Bulk & Export Cartons</h4>
+      <p>Rice bags, flour bags, export cartons, corrugated boxes</p>
+    </div>
+  </div>
+</section>
+
+<!-- OPT-IN FORM -->
+<section class="optin-section" id="get-checklist">
+  <div class="optin-glow"></div>
+  <div class="optin-inner">
+    <div class="section-label reveal" style="justify-content:center;">Get Your Free Copy</div>
+    <h2 class="reveal">
+      Download the<br><em>Free Checklist</em>
+    </h2>
+    <p class="reveal">Fill in your details below and get instant access to The African Brand Packaging Checklist — completely free.</p>
+
+    <!-- PRIVACY ASSURANCE -->
+    <div class="privacy-notice reveal">
+      <span class="privacy-icon">🔒</span>
+      <span>We will <strong>never</strong> sell, share, or give out your information. Ever. It stays between you and Puregold Prints — full stop.</span>
+    </div>
+
+    <div id="form-wrapper">
+      <form class="optin-form reveal" id="optin-form" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Your Name</label>
+            <input type="text" id="f-name" class="form-input" placeholder="e.g. Amara Johnson" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Business Name</label>
+            <input type="text" id="f-business" class="form-input" placeholder="e.g. Glow Naturals" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">WhatsApp Number</label>
+          <input type="tel" id="f-phone" class="form-input" placeholder="e.g. +254 700 000 000" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">What do you mainly need?</label>
+          <select id="f-need" class="form-select" required>
+            <option value="" disabled selected>Select your primary need</option>
+            <option>Product boxes & cartons</option>
+            <option>Labels & stickers</option>
+            <option>Branded bags</option>
+            <option>Branded merchandise (T-shirts, caps etc.)</option>
+            <option>Flyers & print materials</option>
+            <option>Multiple services</option>
+            <option>Still exploring</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <select id="f-country" class="form-select" required>
+            <option value="" disabled selected>Where are you based?</option>
+            <option>Nigeria</option>
+            <option>Kenya</option>
+            <option>Uganda</option>
+            <option>Ghana</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span id="btn-text">Send Me the Free Checklist →</span>
+          <span id="btn-loading" style="display:none;">Saving your details…</span>
+        </button>
+
+        <p class="form-disclaimer">🔒 Your details are saved privately and securely. We will never sell, share, or pass your information to any third party. You'll only hear from Puregold Prints.</p>
+      </form>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-state" id="success-state">
+      <span class="success-icon">🎉</span>
+      <h3>You're All Set!</h3>
+      <p>Your checklist is downloading now. If it doesn't start automatically, click the button below.</p>
+      <button class="btn-download" onclick="triggerDownload()">📥 Download Checklist</button>
+      <div class="privacy-badge">
+        <span>🔒</span>
+        <span>Your information is safe with us. We will never sell or share your details with anyone.</span>
+      </div>
+      <p style="margin-top:24px;font-size:13px;color:var(--grey);">
+        Have a packaging need right now?<br>
+        <a href="https://wa.me/2349064269409" target="_blank" style="color:var(--gold);text-decoration:none;">Chat with us on WhatsApp →</a>
+      </p>
+    </div>
+
+    <!-- ERROR STATE -->
+    <div id="error-state" style="display:none;text-align:center;padding:20px;background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);margin-top:16px;">
+      <p style="color:#E07070;font-size:14px;" id="error-msg">Something went wrong. Please try again.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">Puregold Prints</div>
+  <div class="footer-sub">Lagos, Nigeria · Serving Kenya & Uganda · 20+ Years of Excellence</div>
+  <div class="footer-links">
+    <a href="https://wa.me/2349064269409">WhatsApp Us</a>
+    <a href="https://www.instagram.com/puregold_prints?igsh=emVneDBlcngxMThl">Instagram</a>
+    <a href="https://wa.me/2349064269409?text=Hi%2C%20I%27d%20like%20a%20quote">Get a Quote</a>
+  </div>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── Config ──
+  const NOTION_TOKEN = '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';
+  const DATABASE_ID  = 'fc43323201a08313b3e501db77fa8157';
+  const CHECKLIST_FILE = 'puregold-packaging-checklist.html';
+
+  function triggerDownload() {
+    const a = document.createElement('a');
+    a.href = CHECKLIST_FILE;
+    a.download = 'Puregold-Packaging-Checklist.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  async function saveToNotion(data) {
+    const today = new Date().toISOString().split('T')[0];
+    const payload = {
+      parent: { database_id: DATABASE_ID },
+      properties: {
+        // Title field (Name)
+        'Name': {
+          title: [{ text: { content: data.name } }]
+        },
+        'Company Name': {
+          rich_text: [{ text: { content: data.business } }]
+        },
+        'Phone': {
+          phone_number: data.phone
+        },
+        'Address': {
+          rich_text: [{ text: { content: data.country } }]
+        },
+        'Date': {
+          date: { start: today }
+        }
+      }
+    };
+
+    const res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + NOTION_TOKEN,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Notion API error');
+    }
+    return res.json();
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const name     = document.getElementById('f-name').value.trim();
+    const business = document.getElementById('f-business').value.trim();
+    const phone    = document.getElementById('f-phone').value.trim();
+    const need     = document.getElementById('f-need').value;
+    const country  = document.getElementById('f-country').value;
+
+    // Show loading state
+    const btn = document.getElementById('submit-btn');
+    document.getElementById('btn-text').style.display = 'none';
+    document.getElementById('btn-loading').style.display = 'inline';
+    btn.disabled = true;
+    document.getElementById('error-state').style.display = 'none';
+
+    try {
+      await saveToNotion({ name, business, phone, need, country });
+
+      // Success — show success state and trigger download
+      document.getElementById('form-wrapper').style.display = 'none';
+      document.getElementById('success-state').classList.add('show');
+      window.scrollTo({ top: document.getElementById('get-checklist').offsetTop - 80, behavior: 'smooth' });
+
+      // Auto-trigger download after short delay
+      setTimeout(triggerDownload, 800);
+
+    } catch (err) {
+      // Show error, re-enable form
+      document.getElementById('btn-text').style.display = 'inline';
+      document.getElementById('btn-loading').style.display = 'none';
+      btn.disabled = false;
+      document.getElementById('error-state').style.display = 'block';
+      document.getElementById('error-msg').textContent = 'Something went wrong saving your details. Please try again or WhatsApp us directly.';
+      console.error('Notion error:', err);
+    }
+  }
+</script>
+</body>
+</html>
