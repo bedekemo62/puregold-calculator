@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Puregold Prints — Quote Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9A84C;--gold-light:#E8C96A;--gold-dark:#A07830;
+  --green:#1A4A2E;--green-mid:#2D6B45;--green-light:#4A9B6A;
+  --navy:#0D1B3E;--navy-mid:#162444;--navy-light:#1F3260;
+  --white:#FAF8F2;--muted:#8A9BB8;--danger:#E05A4E;--radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);}
+
+/* ── PAGE STACK ── */
+#page-stack{
+  position:fixed;inset:0;
+  display:flex;flex-direction:row;
+  width:100%;height:100%;
+  overflow:hidden;
+}
+.page{
+  min-width:100vw;width:100vw;height:100%;
+  overflow-y:auto;overflow-x:hidden;
+  position:relative;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+  flex-shrink:0;
+}
+.page::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 85% 10%,rgba(201,168,76,.13) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 70% at 5% 90%,rgba(26,74,46,.25) 0%,transparent 65%),
+    linear-gradient(150deg,#0D1B3E 0%,#09142E 60%,#060D20 100%);
+  z-index:0;pointer-events:none;
+}
+.page>*{position:relative;z-index:1;}
+
+/* ── SHARED ── */
+.wrap{max-width:960px;margin:0 auto;padding:0 20px;}
+.wrap-wide{max-width:1100px;margin:0 auto;padding:0 20px;}
+.gold{color:var(--gold);}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(201,168,76,.4);padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:var(--navy);}
+.btn-gold:hover:not(:disabled){background:linear-gradient(135deg,var(--gold-light),var(--gold));transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,168,76,.4);}
+.btn-green{background:var(--green-mid);color:var(--white);}
+.btn-green:hover{background:var(--green-light);}
+.btn-ghost{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.2);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{background:rgba(224,90,78,.15);color:var(--danger);border:1px solid rgba(224,90,78,.3);}
+.btn-danger:hover{background:rgba(224,90,78,.25);}
+.btn-sm{padding:8px 16px;font-size:13px;}
+input,select,textarea{font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--white);border-radius:8px;padding:10px 14px;font-size:14px;width:100%;transition:border-color .2s;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+input::placeholder,textarea::placeholder{color:var(--muted);}
+select option{background:var(--navy-mid);color:var(--white);}
+label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px;letter-spacing:.5px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-group{margin-bottom:16px;}
+
+/* ── HERO ── */
+.hero-logo{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,72px);font-weight:900;background:linear-gradient(135deg,var(--gold-light),var(--gold),var(--gold-dark));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:8px;}
+.hero-sub{font-size:14px;font-weight:300;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:40px;}
+.hero-heading{font-size:clamp(22px,4vw,40px);font-weight:700;max-width:620px;margin:0 auto 16px;line-height:1.3;}
+.hero-body{font-size:15px;color:var(--muted);max-width:500px;margin:0 auto 40px;line-height:1.8;}
+.hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.hero-cta .btn{padding:16px 36px;font-size:15px;}
+.divider-line{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 36px;max-width:200px;opacity:.4;}
+.services-preview{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:700px;margin:0 auto 48px;}
+.service-chip{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:500;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+
+/* ── CALC ── */
+.calc-header{text-align:center;padding:40px 20px 24px;}
+.calc-header h1{font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,42px);font-weight:900;margin-bottom:10px;}
+.calc-header p{color:var(--muted);font-size:14px;max-width:480px;margin:0 auto;}
+.steps-bar{display:flex;justify-content:center;align-items:center;margin-bottom:28px;padding:0 20px;}
+.step-item{display:flex;align-items:center;gap:6px;}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid rgba(255,255,255,.15);color:var(--muted);transition:all .3s;flex-shrink:0;}
+.step-circle.active{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.step-circle.done{background:var(--green-mid);border-color:var(--green-mid);color:var(--white);}
+.step-label{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;}
+.step-label.active{color:var(--gold);}
+.step-connector{width:28px;height:2px;background:rgba(255,255,255,.1);margin:0 3px;flex-shrink:0;}
+.step-connector.done{background:var(--green-mid);}
+
+/* ── CARDS ── */
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:22px;margin-bottom:14px;}
+.card-title{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.card-title .icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+
+/* ── PRODUCT GRID ── */
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+.product-card{border:2px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.03);overflow:hidden;display:flex;flex-direction:column;}
+.product-card:hover,.product-card:active{border-color:rgba(201,168,76,.4);}
+.product-card.selected{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.product-img-area{width:100%;height:96px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);overflow:hidden;}
+.product-img-area img{width:100%;height:100%;object-fit:contain;padding:8px;}
+.p-emoji{font-size:38px;}
+.product-info{padding:7px 8px 9px;text-align:center;}
+.p-name{font-size:12px;font-weight:600;line-height:1.3;}
+.selected-bar{background:var(--gold);color:var(--navy);text-align:center;font-size:10px;font-weight:700;padding:3px 0;}
+
+/* ── TIERS ── */
+.tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.tier-card{border:2px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 10px;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
+.tier-card:hover,.tier-card:active{border-color:rgba(201,168,76,.4);}
+.tier-card.selected{border-color:var(--gold);background:rgba(201,168,76,.08);}
+.t-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.t-desc{font-size:11px;color:var(--muted);line-height:1.4;}
+.tier-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px;white-space:nowrap;}
+
+/* ── OPTIONS ── */
+.options-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;}
+.option-btn{padding:9px 10px;border-radius:8px;border:2px solid rgba(255,255,255,.1);background:transparent;color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;text-align:center;width:100%;}
+.option-btn:hover,.option-btn:active{border-color:rgba(201,168,76,.4);}
+.option-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold);}
+
+/* ── QTY ── */
+.qty-input{display:flex;align-items:center;gap:10px;max-width:200px;}
+.qty-btn{width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:var(--white);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+.qty-btn:hover{border-color:var(--gold);color:var(--gold);}
+.qty-tiers{display:flex;flex-wrap:wrap;gap:8px;}
+.qty-tier-btn{padding:7px 16px;border-radius:8px;border:2px solid rgba(255,255,255,.1);background:transparent;color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.qty-tier-btn:hover{border-color:rgba(201,168,76,.4);}
+.qty-tier-btn.selected{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold);}
+
+/* ── SUMMARY ── */
+.summary-box{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:var(--radius);padding:20px;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.summary-row:last-child{border-bottom:none;}
+.s-label{font-size:13px;color:var(--muted);}
+.s-val{font-size:13px;font-weight:600;text-align:right;max-width:60%;}
+.summary-total{display:flex;justify-content:space-between;align-items:center;padding:16px 0 0;margin-top:8px;border-top:2px solid rgba(201,168,76,.3);}
+.t-label{font-size:15px;font-weight:700;}
+.t-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--gold);}
+.currency-toggle{display:flex;gap:4px;background:rgba(0,0,0,.3);border-radius:8px;padding:4px;}
+.curr-btn{padding:5px 12px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);}
+.curr-btn.active{background:var(--gold);color:var(--navy);}
+.discount-toggle{display:flex;align-items:center;gap:12px;background:rgba(26,74,46,.2);border:1px solid rgba(74,155,106,.3);border-radius:10px;padding:12px 16px;margin-top:12px;cursor:pointer;user-select:none;}
+.toggle-switch{width:40px;height:22px;border-radius:11px;background:rgba(255,255,255,.1);position:relative;transition:background .2s;flex-shrink:0;}
+.toggle-switch.on{background:var(--green-light);}
+.toggle-knob{width:16px;height:16px;border-radius:50%;background:var(--white);position:absolute;top:3px;left:3px;transition:left .2s;}
+.toggle-switch.on .toggle-knob{left:21px;}
+.d-title{font-size:13px;font-weight:600;}
+.d-sub{font-size:11px;color:var(--muted);}
+.discount-input-row{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.discount-input-row input{max-width:80px;text-align:center;}
+
+/* ── CONTACT ── */
+.contact-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:22px;}
+.calc-nav{display:flex;justify-content:space-between;align-items:center;padding:16px 0 40px;}
+
+/* ── VIEWER ── */
+.viewer-box{width:100%;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);overflow:hidden;margin-bottom:14px;}
+.viewer-label{padding:7px 14px;border-bottom:1px solid rgba(255,255,255,.07);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);}
+.viewer-stage{position:relative;width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.02);}
+.viewer-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px;}
+.viewer-stage img:first-child{position:relative;}
+.viewer-placeholder{text-align:center;padding:20px;}
+.viewer-placeholder span{font-size:48px;opacity:.5;display:block;margin-bottom:8px;}
+.viewer-placeholder p{font-size:11px;color:var(--muted);max-width:130px;margin:0 auto;line-height:1.5;}
+.viewer-tags{padding:7px 12px;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-wrap:wrap;gap:5px;}
+.viewer-tag{font-size:10px;padding:2px 7px;border-radius:5px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.2);color:var(--gold);}
+
+/* ── ADMIN ── */
+.admin-topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);}
+.admin-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;}
+.admin-product-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.admin-product-card:hover{border-color:rgba(255,255,255,.15);}
+.apc-header{display:flex;justify-content:space-between;align-items:center;}
+.apc-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.apc-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.tier-pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.tier-price-box{background:rgba(0,0,0,.2);border-radius:8px;padding:10px;}
+.tier-price-box h4{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--navy-mid);border:1px solid rgba(255,255,255,.12);border-radius:14px;width:100%;max-width:580px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;}
+.modal-head{padding:18px 22px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+.modal-head h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:14px;}
+.modal-tabs{display:flex;gap:0;}
+.modal-tab{padding:7px 13px;font-size:12px;font-weight:600;border:none;background:transparent;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.modal-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.modal-body{flex:1;overflow-y:auto;padding:18px 22px;}
+.modal-footer{padding:12px 22px;border-top:1px solid rgba(255,255,255,.08);display:flex;justify-content:flex-end;gap:10px;}
+
+/* ── IMG UPLOADER ── */
+.img-uploader{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.img-preview{width:58px;height:58px;border-radius:8px;border:2px dashed rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:all .2s;background:rgba(255,255,255,.03);}
+.img-preview.has-img{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06);}
+.img-preview img{width:100%;height:100%;object-fit:contain;padding:4px;}
+.img-ph{font-size:22px;opacity:.3;}
+.img-meta label{font-size:11px;margin-bottom:5px;}
+.img-actions{display:flex;gap:5px;flex-wrap:wrap;}
+
+/* ── OPTION GROUP EDITOR ── */
+.og-box{background:rgba(0,0,0,.2);border-radius:10px;padding:12px;margin-bottom:10px;}
+.og-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;}
+.opt-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;font-size:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);}
+.opt-tag button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:32px;width:100%;max-width:340px;text-align:center;}
+.login-box h2{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;}
+.login-box p{color:var(--muted);font-size:13px;margin-bottom:20px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--green-mid);color:var(--white);padding:11px 16px;border-radius:10px;font-size:13px;font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.err{background:var(--danger);}
+
+/* ── SWIPE HINT ── */
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);padding:8px 0 0;opacity:.6;}
+
+@media(max-width:600px){
+  .tier-grid{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .tier-pricing{grid-template-columns:1fr;}
+  .step-label{display:none;}
+  .step-connector{width:18px;}
+  .apc-actions{flex-direction:column;align-items:flex-end;}
+  .calc-viewer-layout{flex-direction:column!important;}
+}
+</style>
+</head>
+<body>
+
+<div id="page-stack">
+  <!-- PAGE 0: HOME -->
+  <div class="page" id="page-home">
+    <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:80px 20px 60px;text-align:center;">
+      <div class="wrap">
+        <div class="hero-logo">Puregold Prints</div>
+        <div class="hero-sub">Premium Print Solutions · West Africa</div>
+        <div class="divider-line"></div>
+        <h1 class="hero-heading">Build Your <span class="gold">Custom Quote</span> in Minutes</h1>
+        <p class="hero-body">Configure your print job, pick your quality, see the price live — then send it straight to our team. No waiting, no back-and-forth.</p>
+        <div class="services-preview" id="home-chips"></div>
+        <div class="hero-cta">
+          <button class="btn btn-gold" onclick="goCalc()">🖨️ Get My Quote</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 1: CALCULATOR -->
+  <div class="page" id="page-calc" style="transform:translateX(100vw)">
+    <div class="calc-header">
+      <div class="wrap">
+        <div class="tag">Quote Builder</div>
+        <h1>Configure Your <span class="gold">Print Job</span></h1>
+        <p>Select your product, customise the spec, and see your price instantly.</p>
+      </div>
+    </div>
+    <div class="wrap"><div class="steps-bar" id="steps-bar"></div></div>
+    <div id="calc-step-1" class="calc-panel wrap"></div>
+    <div id="calc-step-2" class="calc-panel wrap" style="display:none"></div>
+    <div id="calc-step-3" class="calc-panel wrap" style="display:none"></div>
+    <div id="calc-step-4" class="calc-panel wrap" style="display:none"></div>
+  </div>
+
+  <!-- PAGE 2: CONTACT -->
+  <div class="page" id="page-contact" style="transform:translateX(200vw)">
+    <div style="padding:40px 20px 80px;">
+      <div class="wrap">
+        <button class="btn btn-ghost btn-sm" onclick="navTo(1)" style="margin-bottom:24px;">← Back to Quote</button>
+        <div class="tag">Almost Done</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:8px;">Your <span class="gold">Details</span></h1>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:28px;">We'll follow up via WhatsApp once you submit.</p>
+        <div class="contact-card">
+          <div class="form-row">
+            <div class="form-group"><label>Full Name *</label><input id="c-name" placeholder="Your name"></div>
+            <div class="form-group"><label>Phone Number *</label><input type="tel" id="c-phone" placeholder="08012345678"></div>
+          </div>
+          <div class="form-group"><label>Email Address *</label><input type="email" id="c-email" placeholder="your@email.com"></div>
+          <div class="form-group"><label>Additional Notes (optional)</label><textarea id="c-notes" rows="3" placeholder="Artwork ready? Special instructions? Deadline?"></textarea></div>
+          <button class="btn btn-gold" onclick="submitQuote()" style="width:100%;padding:16px;font-size:15px;margin-top:8px;">📱 Send to WhatsApp</button>
+          <p style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;">* Estimate only. Final quote confirmed by our team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3: ADMIN LOGIN (URL-gated: ?admin) -->
+  <div class="page" id="page-login" style="transform:translateX(300vw)">
+    <div class="login-wrap">
+      <div class="login-box">
+        <div style="font-size:32px;margin-bottom:12px;">🔐</div>
+        <h2>Admin Access</h2>
+        <p>Enter your password to manage products and pricing.</p>
+        <div class="form-group" style="margin-top:16px;">
+          <input type="password" id="login-pwd" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="btn btn-gold" style="width:100%" onclick="doLogin()">Login</button>
+        <div id="login-err" style="color:var(--danger);font-size:13px;margin-top:8px;display:none;">Incorrect password.</div>
+        <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="navBack()">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4: ADMIN PANEL -->
+  <div class="page" id="page-admin" style="transform:translateX(400vw)">
+    <div class="admin-topbar">
+      <div class="admin-title">⚙️ Product Manager</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ Add Product</button>
+        <button class="btn btn-ghost btn-sm" onclick="history.replaceState(null,'',location.pathname);navTo(0)">← Exit</button>
+      </div>
+    </div>
+    <div style="padding:20px 0 80px;">
+      <div class="wrap-wide">
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-title"><div class="icon">💱</div>Global Settings</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>USD → NGN Rate</label>
+              <input type="number" id="rate-input" placeholder="e.g. 1550" oninput="saveRate()">
+            </div>
+            <div class="form-group">
+              <label>Change Admin Password</label>
+              <input type="password" id="new-pwd" placeholder="New password">
+              <button class="btn btn-green btn-sm" style="margin-top:8px" onclick="changePwd()">Update</button>
+            </div>
+          </div>
+        </div>
+        <div id="admin-list"></div>
+        <div id="admin-empty" style="text-align:center;padding:40px;color:var(--muted);display:none;">No products yet. Click <strong>+ Add Product</strong>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-h2">Add Product</h2>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="modalTab('basic',this)">📝 Basic</button>
+        <button class="modal-tab" onclick="modalTab('pricing',this)">💰 Pricing</button>
+        <button class="modal-tab" onclick="modalTab('options',this)">🎨 Options</button>
+        <button class="modal-tab" onclick="modalTab('images',this)">🖼 Images</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <!-- BASIC TAB -->
+      <div id="mtab-basic">
+        <div class="form-row">
+          <div class="form-group"><label>Product Name *</label><input id="m-name" placeholder="e.g. Business Cards"></div>
+          <div class="form-group"><label>Icon / Emoji</label><input id="m-icon" placeholder="🖨️" maxlength="4"></div>
+        </div>
+        <div class="form-group"><label>Short Description</label><input id="m-desc" placeholder="e.g. Full-colour printing"></div>
+        <div class="form-group">
+          <label>Pricing Model</label>
+          <select id="m-model" onchange="onModelChange()">
+            <option value="tiered">Tiered — Customer picks Standard / Low / Premium tier</option>
+            <option value="layered">Layered — Customer picks individual options that build the price</option>
+          </select>
+          <div id="model-hint-tiered" style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;">
+            Base price is set per tier. Covers all standard inclusions (transport, basic finishing etc.). Customer just picks a tier — simple and fast.
+          </div>
+          <div id="model-hint-layered" style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;display:none;">
+            Base price covers standard inclusions. Customer then selects specific add-ons (extra pages, special binding, premium finish etc.) — each adds to the total. Full transparent breakdown.
+          </div>
+        </div>
+        <div class="form-group"><label>Quantity Type</label>
+          <select id="m-qtype" onchange="toggleQtyConfig()">
+            <option value="typed">Customer types number</option>
+            <option value="tiered">Fixed tiers (e.g. 50, 100, 250)</option>
+            <option value="slider">Slider</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Min Quantity</label><input type="number" id="m-qmin" placeholder="1"></div>
+          <div class="form-group" id="m-qtiers-wrap" style="display:none"><label>Tier Values (comma separated)</label><input id="m-qtiers" placeholder="50,100,250,500"></div>
+        </div>
+        <div id="m-qslider-wrap" style="display:none">
+          <div class="form-row">
+            <div class="form-group"><label>Max</label><input type="number" id="m-qmax" placeholder="5000"></div>
+            <div class="form-group"><label>Step</label><input type="number" id="m-qstep" placeholder="50"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICING TAB -->
+      <div id="mtab-pricing" style="display:none">
+        <!-- TIERED PRICING -->
+        <div id="m-tiered-pricing">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Set the base cost and margin for each tier. The base price covers all standard inclusions for that tier.</p>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:14px;">
+              <div style="font-weight:700;margin-bottom:10px;font-size:14px;">🥉 Standard (Low)</div>
+              <div class="form-row"><div class="form-group"><label>Base Cost (₦)</label><input type="number" id="m-s-cost" placeholder="0"></div><div class="form-group"><label>Margin %</label><input type="number" id="m-s-margin" placeholder="30"></div></div>
+              <div class="form-group"><label>What's included</label><input id="m-s-desc" placeholder="e.g. Standard paper, basic finish, transport included"></div>
+            </div>
+            <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:14px;">
+              <div style="font-weight:700;margin-bottom:10px;font-size:14px;">🥈 Premium</div>
+              <div class="form-row"><div class="form-group"><label>Base Cost (₦)</label><input type="number" id="m-p-cost" placeholder="0"></div><div class="form-group"><label>Margin %</label><input type="number" id="m-p-margin" placeholder="35"></div></div>
+              <div class="form-group"><label>What's included</label><input id="m-p-desc" placeholder="e.g. Glossy finish, vibrant colours, transport included"></div>
+            </div>
+            <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:14px;">
+              <div style="font-weight:700;margin-bottom:10px;font-size:14px;">🥇 Luxury</div>
+              <div class="form-row"><div class="form-group"><label>Base Cost (₦)</label><input type="number" id="m-l-cost" placeholder="0"></div><div class="form-group"><label>Margin %</label><input type="number" id="m-l-margin" placeholder="40"></div></div>
+              <div class="form-group"><label>What's included</label><input id="m-l-desc" placeholder="e.g. Premium paper, foiling available, transport included"></div>
+            </div>
+          </div>
+        </div>
+        <!-- LAYERED PRICING -->
+        <div id="m-layered-pricing" style="display:none">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Set the base price that covers standard inclusions (transport, basic setup etc.). Then add priced options in the Options tab — each one the customer picks adds to this base.</p>
+          <div style="background:rgba(0,0,0,.2);border-radius:10px;padding:14px;">
+            <div style="font-weight:700;margin-bottom:10px;font-size:14px;">📦 Base Price</div>
+            <div class="form-row">
+              <div class="form-group"><label>Base Cost (₦)</label><input type="number" id="m-base-cost" placeholder="0"></div>
+              <div class="form-group"><label>Profit Margin %</label><input type="number" id="m-base-margin" placeholder="35"></div>
+            </div>
+            <div class="form-group"><label>What the base covers</label><input id="m-base-desc" placeholder="e.g. Standard setup, transport, basic finishing"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPTIONS TAB -->
+      <div id="mtab-options" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;" id="m-options-hint"></p>
+        <div id="m-options-list"></div>
+        <button class="btn btn-ghost btn-sm" onclick="addOptionGroup()">+ Add Option Group</button>
+      </div>
+
+      <!-- IMAGES TAB -->
+      <div id="mtab-images" style="display:none">
+        <div style="margin-bottom:18px;">
+          <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">Card Image</div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Shown on product selection screen.</p>
+          <div class="img-uploader">
+            <div class="img-preview" id="prev-card" onclick="triggerUpload('card')">
+              <img id="previmg-card" style="display:none"><span class="img-ph">🖼</span>
+            </div>
+            <div class="img-meta">
+              <label>Product card image</label>
+              <div class="img-actions">
+                <button class="btn btn-ghost btn-sm" onclick="triggerUpload('card')" style="font-size:11px;padding:4px 8px;">+ Upload</button>
+                <button class="btn btn-danger btn-sm" onclick="clearImg('card')" id="clear-card" style="display:none;font-size:11px;padding:4px 8px;">✕</button>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:3px;">PNG with transparency recommended</div>
+            </div>
+          </div>
+        </div>
+        <div id="m-tier-images"></div>
+        <div id="m-layer-images"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
+
+<script>
+// ════════════════════════════════════════
+// STORAGE
+// ════════════════════════════════════════
+const WHATSAPP = '2347073219655';
+const K_PRODUCTS='pg_products', K_GLOBAL='pg_global', K_PWD='pg_admin_pwd';
+
+function getProducts(){
+  try{
+    const r=localStorage.getItem(K_PRODUCTS);
+    if(!r) return defaultProducts();
+    return JSON.parse(r).map(p=>({pricingModel:'tiered',baseCostPrice:0,margin:35,baseDesc:'',pricedOptionGroups:[],optionGroups:[],...p}));
+  }catch{return defaultProducts();}
+}
+function saveProducts(p){localStorage.setItem(K_PRODUCTS,JSON.stringify(p));}
+function getGlobal(){try{return JSON.parse(localStorage.getItem(K_GLOBAL))||{exchangeRate:1550};}catch{return{exchangeRate:1550};}}
+function saveGlobal(g){localStorage.setItem(K_GLOBAL,JSON.stringify(g));}
+function getPwd(){return localStorage.getItem(K_PWD)||'puregold2024';}
+function setPwd(p){localStorage.setItem(K_PWD,p);}
+function fmtN(n,d=0){return Number(n).toLocaleString('en-NG',{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+function calcUnit(p,tier,opts,disc=0){
+  if(p.pricingModel==='layered'){
+    // Base price (always included) + each chosen option's cost price, all marked up together
+    const baseCost = p.baseCostPrice||0;
+    const optCost = (p.pricedOptionGroups||[]).reduce((s,g)=>{
+      const chosen = g.options.find(o=>o.label===opts[g.label]);
+      return s + (chosen ? chosen.costPrice||0 : 0);
+    },0);
+    const m = Math.max(0,(p.margin||35)-disc);
+    return (baseCost + optCost) * (1 + m/100);
+  }
+  // Tiered: each tier has its own base cost + margin
+  if(!tier) return 0;
+  const t = p.tiers[tier];
+  if(!t||!t.cost) return 0;
+  const baseCost = p.baseCostPrice||0; // shared base cost (optional), added to tier cost
+  return (t.cost + baseCost) * (1 + Math.max(0,t.margin-disc)/100);
+}
+
+// ════════════════════════════════════════
+// STATE — declared first so nothing crashes
+// ════════════════════════════════════════
+let CS={step:1,product:null,tier:null,options:{},quantity:0,currency:'NGN',discOn:false,discPct:0};
+
+// ════════════════════════════════════════
+// PAGE NAVIGATION — TRUE PAGE STACK
+// ════════════════════════════════════════
+// Public pages: 0=home, 1=calc, 2=contact
+// Admin pages (URL-gated): 3=login, 4=admin panel
+let currentPage = 0;
+const pages = ['page-home','page-calc','page-contact','page-login','page-admin'];
+
+function navTo(idx){
+  pages.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.style.transform=`translateX(${-idx*100}vw)`;
+  });
+  currentPage=idx;
+  // scroll top on the active page
+  const active=document.getElementById(pages[idx]);
+  if(active) active.scrollTo(0,0);
+}
+
+function navBack(){
+  if(currentPage===4){navTo(3);return;} // admin panel → login
+  if(currentPage===3){                   // login → home (clear ?admin param)
+    history.replaceState(null,'',location.pathname);
+    navTo(0);return;
+  }
+  if(currentPage>0) navTo(currentPage-1);
+}
+
+function goCalc(){
+  CS={step:1,product:null,tier:null,options:{},quantity:0,currency:'NGN',discOn:false,discPct:0};
+  navTo(1);
+  renderStep(1);
+}
+
+function goContact(){navTo(2);}
+
+// ── SWIPE GESTURE ──────────────────────
+let touchStartX=0,touchStartY=0,swipeLocked=false;
+
+document.addEventListener('touchstart',e=>{
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
+  swipeLocked=false;
+},{passive:true});
+
+document.addEventListener('touchmove',e=>{
+  // lock axis early to prevent diagonal jitter
+  if(!swipeLocked){
+    const dx=Math.abs(e.touches[0].clientX-touchStartX);
+    const dy=Math.abs(e.touches[0].clientY-touchStartY);
+    if(dx>8||dy>8) swipeLocked=true;
+  }
+},{passive:true});
+
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=Math.abs(e.changedTouches[0].clientY-touchStartY);
+  if(Math.abs(dx)<55||Math.abs(dx)<dy*1.4) return; // not a clean horizontal swipe
+
+  if(dx<0){
+    // swipe LEFT = forward
+    if(currentPage===0){goCalc();return;}          // home → calc
+    if(currentPage===1){tryNextStep();return;}      // calc: advance step
+    if(currentPage===2) return;                     // contact: no forward
+  } else {
+    // swipe RIGHT = back
+    if(currentPage===1&&CS.step>1){prevStep();return;} // calc: prev step
+    if(currentPage>0&&currentPage<3) navTo(currentPage-1); // page back (public only)
+  }
+},{passive:true});
+
+// Android hardware back
+window.addEventListener('popstate',()=>{
+  if(currentPage>0){navBack();history.pushState(null,'',location.href);}
+});
+history.pushState(null,'',location.href);
+
+// ════════════════════════════════════════
+// CALCULATOR STEPS
+// ════════════════════════════════════════
+
+function renderStep(n){
+  CS.step=n;
+  document.querySelectorAll('.calc-panel').forEach((p,i)=>{p.style.display=(i+1===n)?'block':'none';});
+  renderStepsBar(n);
+  if(n===1)renderStep1();
+  if(n===2)renderStep2();
+  if(n===3)renderStep3();
+  if(n===4)renderStep4();
+  document.getElementById('page-calc').scrollTo(0,0);
+}
+
+function tryNextStep(){
+  if(CS.step===1&&CS.product) renderStep(2);
+  else if(CS.step===2&&canStep2Next()) renderStep(3);
+  else if(CS.step===3&&CS.quantity>0) renderStep(4);
+  else if(CS.step===4) goContact();
+}
+
+function prevStep(){
+  if(CS.step>1) renderStep(CS.step-1);
+}
+
+function canStep2Next(){
+  const p=CS.product;
+  if(!p)return false;
+  if(p.pricingModel==='layered') return (p.pricedOptionGroups||[]).filter(g=>g.required).every(g=>CS.options[g.label]);
+  return CS.tier!==null;
+}
+
+function renderStepsBar(cur){
+  const labels=['Product','Spec','Quantity','Summary'];
+  document.getElementById('steps-bar').innerHTML=labels.map((l,i)=>{
+    const s=i+1,done=s<cur,active=s===cur;
+    return`<div style="display:flex;align-items:center;">
+      <div class="step-item" style="gap:5px;">
+        <div class="step-circle${done?' done':active?' active':''}">${done?'✓':s}</div>
+        <div class="step-label${active?' active':''}">${l}</div>
+      </div>
+      ${s<4?`<div class="step-connector${done?' done':''}"></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── STEP 1 ─────────────────────────────
+function renderStep1(){
+  const products=getProducts();
+  document.getElementById('calc-step-1').innerHTML=`
+    <div class="card">
+      <div class="card-title"><div class="icon">📋</div>Choose a Product</div>
+      <div class="product-grid">
+        ${products.map(p=>{
+          const img=p.cardImage||p.tiers?.standard?.image||p.tiers?.premium?.image||p.baseImage;
+          const sel=CS.product?.id===p.id;
+          return`<div class="product-card${sel?' selected':''}" onclick="selectProduct('${p.id}')">
+            <div class="product-img-area">${img?`<img src="${img}" alt="${p.name}">`:`<span class="p-emoji">${p.icon}</span>`}</div>
+            <div class="product-info"><div class="p-name">${p.name}</div></div>
+            ${sel?`<div class="selected-bar">✓ Selected</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="swipe-hint">← swipe to go back · swipe to continue →</div>
+    <div class="calc-nav">
+      <button class="btn btn-ghost" onclick="navBack()">← Back</button>
+      <button class="btn btn-gold" onclick="renderStep(2)" ${!CS.product?'disabled':''}>Next →</button>
+    </div>`;
+}
+
+function selectProduct(id){
+  CS.product=getProducts().find(p=>p.id===id);
+  CS.tier=null;CS.options={};CS.quantity=0;
+  renderStep1();
+}
+
+// ── STEP 2 ─────────────────────────────
+function renderStep2(){
+  const p=CS.product;
+  const hasImg=!!(p.baseImage||p.cardImage||p.tiers?.standard?.image||p.tiers?.premium?.image||p.tiers?.luxury?.image||(p.pricedOptionGroups||[]).some(g=>Object.keys(g.layerImages||{}).length>0)||(p.optionGroups||[]).some(g=>Object.keys(g.layerImages||{}).length>0));
+  const config=p.pricingModel==='layered'?buildLayeredConfig(p):buildTieredConfig(p);
+  const viewer=hasImg?buildViewer(p):'';
+
+  document.getElementById('calc-step-2').innerHTML=`
+    <div style="display:flex;gap:14px;align-items:start;" class="calc-viewer-layout">
+      <div style="flex:1;min-width:0;">${config}</div>
+      ${hasImg?`<div style="width:200px;flex-shrink:0;position:sticky;top:20px;">${viewer}</div>`:''}
+    </div>
+    <div class="swipe-hint">← swipe back · swipe to continue →</div>
+    <div class="calc-nav">
+      <button class="btn btn-ghost" onclick="renderStep(1)">← Back</button>
+      <button class="btn btn-gold" onclick="renderStep(3)" ${canStep2Next()?'':'disabled'}>Next →</button>
+    </div>`;
+}
+
+function buildTieredConfig(p){
+  const TIERS=[{k:'standard',l:'Standard',b:null,i:'🥉'},{k:'premium',l:'Premium',b:'Popular',i:'🥈'},{k:'luxury',l:'Luxury',b:'Best',i:'🥇'}];
+  const baseCost = p.baseCostPrice||0;
+
+  const tiersHTML=TIERS.map(tc=>{
+    const t=p.tiers[tc.k];
+    if(!t||!t.cost)return'';
+    const totalCost = t.cost + baseCost;
+    const sellPrice = totalCost * (1 + t.margin/100);
+    const sel=CS.tier===tc.k;
+    const thumb=t.image?`<div style="width:40px;height:40px;margin:0 auto 6px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.05);"><img src="${t.image}" style="width:100%;height:100%;object-fit:contain;padding:3px;"></div>`:`<div style="font-size:22px;margin-bottom:6px;">${tc.i}</div>`;
+    return`<div class="tier-card${sel?' selected':''}" onclick="selectTier('${tc.k}')">
+      ${tc.b?`<div class="tier-badge">${tc.b}</div>`:''}
+      ${thumb}
+      <div class="t-name">${tc.l}</div>
+      <div class="t-desc">${t.desc||''}</div>
+      <div style="margin-top:8px;font-size:15px;font-weight:700;color:var(--gold);">₦${fmtN(sellPrice)}<span style="font-size:10px;color:var(--muted);font-weight:400;">/unit</span></div>
+    </div>`;
+  }).join('');
+
+  // Optional: show base context if baseCostPrice is set
+  const baseNote = baseCost>0 ? `<p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Each tier includes a shared base cost of ₦${fmtN(baseCost)} (transport, setup) plus the tier-specific production cost.</p>` : '';
+
+  const optHTML=(p.optionGroups||[]).length?`
+    <div class="card">
+      <div class="card-title"><div class="icon">🎨</div>Customise Options</div>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">These options are included in your selected tier price — pick your preferences.</p>
+      ${(p.optionGroups||[]).map(og=>`
+        <div style="margin-bottom:16px;">
+          <label>${og.label}</label>
+          <div class="options-grid" style="margin-top:6px;">
+            ${og.options.map(opt=>`<button class="option-btn${CS.options[og.label]===opt?' selected':''}" onclick="selectOpt('${og.label}','${opt}')">${opt}</button>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`:'';
+
+  return`<div class="card"><div class="card-title"><div class="icon">✨</div>Choose Your Quality Tier</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Each tier's price covers everything — transport, finishing, and setup. Pick the level that suits your budget.</p>
+    ${baseNote}
+    <div class="tier-grid">${tiersHTML}</div></div>${optHTML}`;
+}
+
+function buildLayeredConfig(p){
+  const margin = p.margin||35;
+  const baseSellPrice = (p.baseCostPrice||0) * (1 + margin/100);
+
+  // Base price box — always shown for layered
+  const baseBox=`
+    <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:14px 16px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:13px;font-weight:700;color:var(--gold);">📦 Base Price</span>
+        <span style="font-size:16px;font-weight:700;color:var(--gold);">₦${fmtN(baseSellPrice)}<span style="font-size:10px;color:var(--muted);font-weight:400;">/unit</span></span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">${p.baseDesc||'Covers standard inclusions: transport, setup, basic finishing.'}</div>
+    </div>`;
+
+  // Add-on option groups
+  const groups=(p.pricedOptionGroups||[]).map(g=>{
+    const sel=CS.options[g.label];
+    return`<div style="margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <label style="margin:0;">${g.label}</label>
+        ${g.required?`<span style="font-size:10px;background:rgba(201,168,76,.15);color:var(--gold);padding:2px 6px;border-radius:4px;font-weight:600;">Required</span>`:'<span style="font-size:10px;color:var(--muted);">Optional</span>'}
+      </div>
+      <div class="options-grid">
+        ${g.options.map(opt=>{
+          const addOnCost = opt.costPrice||0;
+          const addOnSell = addOnCost * (1 + margin/100);
+          const isSel = sel===opt.label;
+          return`<button class="option-btn${isSel?' selected':''}" onclick="selectLayerOpt('${g.label}','${opt.label}')" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px;">
+            <span style="font-weight:600;font-size:12px;">${opt.label}</span>
+            <span style="font-size:10px;color:${isSel?'rgba(255,255,255,.75)':'var(--gold)'};">${addOnSell>0?'+₦'+fmtN(addOnSell):'included'}</span>
+          </button>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Running total — base + all chosen add-ons
+  const chosenAddOnTotal = (p.pricedOptionGroups||[]).reduce((s,g)=>{
+    const chosen = g.options.find(o=>o.label===CS.options[g.label]);
+    return s + (chosen ? (chosen.costPrice||0)*(1+margin/100) : 0);
+  },0);
+  const runningTotal = baseSellPrice + chosenAddOnTotal;
+
+  const hasSelections = Object.keys(CS.options).length>0;
+  const runningBar = `
+    <div style="margin-top:4px;padding:14px 16px;background:rgba(13,27,62,.6);border:1px solid rgba(201,168,76,.2);border-radius:10px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">Running Total</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;">
+          <span style="color:var(--muted);">Base</span>
+          <span>₦${fmtN(baseSellPrice)}</span>
+        </div>
+        ${(p.pricedOptionGroups||[]).map(g=>{
+          const chosen=g.options.find(o=>o.label===CS.options[g.label]);
+          if(!chosen)return'';
+          const addOn=(chosen.costPrice||0)*(1+margin/100);
+          return`<div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--muted);">${g.label}: ${chosen.label}</span>
+            <span style="color:var(--green-light);">+₦${fmtN(addOn)}</span>
+          </div>`;
+        }).join('')}
+        <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:6px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:700;">Total/unit</span>
+          <span style="font-size:20px;font-weight:900;color:var(--gold);font-family:'Playfair Display',serif;">₦${fmtN(runningTotal)}</span>
+        </div>
+      </div>
+    </div>`;
+
+  return`<div class="card">
+    <div class="card-title"><div class="icon">✨</div>Build Your Spec</div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Start from the base price, then add what you need. Each option adds to your total.</p>
+    ${baseBox}
+    ${groups.length?`<div style="margin-bottom:16px;">${groups}</div>`:''}
+    ${runningBar}
+  </div>`;
+}
+
+function buildViewer(p){
+  const layers=[];
+  if(p.pricingModel==='layered'){
+    if(p.baseImage)layers.push(p.baseImage);
+    (p.pricedOptionGroups||[]).forEach(g=>{const c=CS.options[g.label];if(c&&g.layerImages?.[c])layers.push(g.layerImages[c]);});
+  }else{
+    const ti=CS.tier&&p.tiers[CS.tier]?.image;
+    if(ti)layers.push(ti);
+    else if(p.tiers?.standard?.image)layers.push(p.tiers.standard.image);
+    else if(p.tiers?.premium?.image)layers.push(p.tiers.premium.image);
+    else if(p.cardImage)layers.push(p.cardImage);
+    (p.optionGroups||[]).forEach(g=>{const c=CS.options[g.label];if(c&&g.layerImages?.[c])layers.push(g.layerImages[c]);});
+  }
+  const stage=layers.length?layers.map((src,i)=>`<img src="${src}" alt="" style="z-index:${i+1};${i>0?'position:absolute;inset:0;':''}">`).join(''):`<div class="viewer-placeholder"><span>${p.icon}</span><p>Add images in Admin to enable preview</p></div>`;
+  const tags=Object.entries(CS.options).map(([k,v])=>`<div class="viewer-tag">${k}: <strong>${v}</strong></div>`).join('');
+  return`<div class="viewer-box"><div class="viewer-label">👁 Live Preview</div><div class="viewer-stage">${stage}</div>${tags?`<div class="viewer-tags">${tags}</div>`:''}</div>`;
+}
+
+function selectTier(k){CS.tier=k;renderStep2();}
+function selectOpt(g,v){CS.options[g]=v;renderStep2();}
+function selectLayerOpt(g,v){CS.options[g]=v;renderStep2();}
+
+// ── STEP 3 ─────────────────────────────
+function renderStep3(){
+  const p=CS.product,min=p.qtyMin||1;
+  let qtyHTML='';
+  if(p.qtyType==='tiered'){
+    qtyHTML=`<label style="margin-bottom:12px;display:block;">Select a quantity</label><div class="qty-tiers">${(p.qtyTiers||[]).map(q=>`<button class="qty-tier-btn${CS.quantity===q?' selected':''}" onclick="setQty(${q})">${fmtN(q)}</button>`).join('')}</div>`;
+  }else if(p.qtyType==='slider'){
+    const smin=p.qtySliderMin||min,smax=p.qtySliderMax||5000,step=p.qtyStep||50,val=CS.quantity||smin;
+    qtyHTML=`<label>Quantity: <strong id="slider-disp">${fmtN(val)}</strong></label><input type="range" min="${smin}" max="${smax}" step="${step}" value="${val}" style="width:100%;margin-top:10px;accent-color:var(--gold);" oninput="setQtySlider(this.value)"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;"><span>${smin}</span><span>${smax}</span></div>`;
+    if(!CS.quantity)CS.quantity=smin;
+  }else{
+    const val=CS.quantity||min;
+    qtyHTML=`<label>Quantity (minimum ${min})</label><div class="qty-input" style="margin-top:8px;"><button class="qty-btn" onclick="adjQty(-1)">−</button><input type="number" id="qty-typed" min="${min}" value="${val}" style="text-align:center;max-width:90px;" oninput="setQtyTyped()"><button class="qty-btn" onclick="adjQty(1)">+</button></div>`;
+    if(!CS.quantity)CS.quantity=min;
+  }
+  document.getElementById('calc-step-3').innerHTML=`
+    <div class="card"><div class="card-title"><div class="icon">🔢</div>How Many Do You Need?</div>${qtyHTML}</div>
+    <div class="swipe-hint">← swipe back · swipe to continue →</div>
+    <div class="calc-nav">
+      <button class="btn btn-ghost" onclick="renderStep(2)">← Back</button>
+      <button class="btn btn-gold" onclick="renderStep(4)" ${!CS.quantity||CS.quantity<1?'disabled':''} id="s3-next">Next →</button>
+    </div>`;
+}
+
+function setQty(q){CS.quantity=q;renderStep3();}
+function setQtySlider(v){CS.quantity=parseInt(v);document.getElementById('slider-disp').textContent=fmtN(CS.quantity);document.getElementById('s3-next').disabled=false;}
+function adjQty(d){const p=CS.product,min=p.qtyMin||1,inp=document.getElementById('qty-typed'),v=Math.max(min,(parseInt(inp.value)||min)+d);inp.value=v;CS.quantity=v;}
+function setQtyTyped(){const v=parseInt(document.getElementById('qty-typed').value)||0;CS.quantity=v;document.getElementById('s3-next').disabled=v<1;}
+
+// ── STEP 4 ─────────────────────────────
+function renderStep4(){
+  const p=CS.product,g=getGlobal(),rate=g.exchangeRate||1550,disc=CS.discOn?CS.discPct:0;
+  const unitNGN=calcUnit(p,CS.tier,CS.options,disc),totalNGN=unitNGN*CS.quantity;
+  const unit=CS.currency==='NGN'?`₦${fmtN(unitNGN)}`:`$${fmtN(unitNGN/rate,2)}`;
+  const total=CS.currency==='NGN'?`₦${fmtN(totalNGN)}`:`$${fmtN(totalNGN/rate,2)}`;
+
+  const optRows=p.pricingModel==='layered'
+    ?(p.pricedOptionGroups||[]).map(gr=>{
+        const chosen=CS.options[gr.label];if(!chosen)return'';
+        const opt=gr.options.find(o=>o.label===chosen);
+        const addOn=opt?opt.costPrice*(1+(p.margin||0)/100):0;
+        return`<div class="summary-row"><span class="s-label">${gr.label}</span><span class="s-val">${chosen}${addOn>0?` <small style="color:var(--muted);">(+₦${fmtN(addOn)}/unit)</small>`:' <small style="color:var(--muted);">(included)</small>'}</span></div>`;
+      }).join('')
+    :`<div class="summary-row"><span class="s-label">Quality Tier</span><span class="s-val" style="text-transform:capitalize;">${CS.tier}</span></div>
+      ${Object.entries(CS.options).length?`<div class="summary-row"><span class="s-label">Options</span><span class="s-val">${Object.entries(CS.options).map(([k,v])=>k+': '+v).join(' · ')}</span></div>`:''}`;
+
+  document.getElementById('calc-step-4').innerHTML=`
+    <div class="card">
+      <div class="card-title"><div class="icon">💰</div>Your Quote
+        <div style="margin-left:auto;"><div class="currency-toggle"><button class="curr-btn${CS.currency==='NGN'?' active':''}" onclick="setCurr('NGN')">₦ NGN</button><button class="curr-btn${CS.currency==='USD'?' active':''}" onclick="setCurr('USD')">$ USD</button></div></div>
+      </div>
+      <div class="summary-box">
+        <div class="summary-row"><span class="s-label">Product</span><span class="s-val">${p.icon} ${p.name}</span></div>
+        ${optRows}
+        <div class="summary-row"><span class="s-label">Quantity</span><span class="s-val">${fmtN(CS.quantity)} units</span></div>
+        <div class="summary-row"><span class="s-label">Unit Price</span><span class="s-val">${unit}</span></div>
+        ${CS.discOn&&CS.discPct>0?`<div class="summary-row" style="color:var(--green-light);"><span class="s-label">Volume Discount</span><span class="s-val">−${CS.discPct}%</span></div>`:''}
+        <div class="summary-total"><span class="t-label">Total Estimate</span><span class="t-val">${total}</span></div>
+      </div>
+      <div class="discount-toggle" onclick="toggleDisc()">
+        <div class="toggle-switch${CS.discOn?' on':''}"><div class="toggle-knob"></div></div>
+        <div><div class="d-title">🎁 Volume Discount</div><div class="d-sub">Apply a % off for large orders</div></div>
+      </div>
+      ${CS.discOn?`<div class="discount-input-row"><label style="margin:0;white-space:nowrap;">Discount %</label><input type="number" min="0" max="50" value="${CS.discPct}" style="max-width:80px;text-align:center;" oninput="setDisc(this.value)" onclick="event.stopPropagation()"><span style="font-size:12px;color:var(--muted);">off your margin only</span></div>`:''}
+      <p style="font-size:11px;color:var(--muted);margin-top:12px;">* Estimate only. Final quote confirmed by our team.</p>
+    </div>
+    <div class="calc-nav">
+      <button class="btn btn-ghost" onclick="renderStep(3)">← Back</button>
+      <button class="btn btn-gold" onclick="goContact()">Proceed to Contact →</button>
+    </div>`;
+}
+
+function setCurr(c){CS.currency=c;renderStep4();}
+function toggleDisc(){CS.discOn=!CS.discOn;renderStep4();}
+function setDisc(v){CS.discPct=parseFloat(v)||0;}
+
+// Step 5 is now the standalone contact page — renderStep5 is unused but kept for swipe tryNextStep compat
+function renderStep5(){goContact();}
+
+function submitQuote(){
+  const name=document.getElementById('c-name').value.trim();
+  const phone=document.getElementById('c-phone').value.trim();
+  const email=document.getElementById('c-email').value.trim();
+  const notes=document.getElementById('c-notes').value.trim();
+  if(!name||!phone||!email){showToast('Please fill all required fields',true);return;}
+  const p=CS.product,g=getGlobal(),rate=g.exchangeRate||1550;
+  const unitNGN=calcUnit(p,CS.tier,CS.options,0),totalNGN=unitNGN*CS.quantity;
+  const optLines=p.pricingModel==='layered'
+    ?(p.pricedOptionGroups||[]).map(gr=>{const c=CS.options[gr.label];if(!c)return null;const opt=gr.options.find(o=>o.label===c);const add=opt?opt.costPrice*(1+(p.margin||0)/100):0;return`  • ${gr.label}: ${c}${add>0?' (+₦'+fmtN(add)+'/unit)':''}`;}).filter(Boolean)
+    :[`  • Quality: ${(CS.tier||'').charAt(0).toUpperCase()+(CS.tier||'').slice(1)}`,...Object.entries(CS.options).map(([k,v])=>`  • ${k}: ${v}`)];
+  const msg=[
+    `🖨️ *NEW PRINT QUOTE — PUREGOLD PRINTS*`,``,
+    `👤 *Customer*`,`Name: ${name}`,`Phone: ${phone}`,`Email: ${email}`,``,
+    `📋 *Quote*`,`Product: ${p.icon} ${p.name}`,...optLines,`Quantity: ${fmtN(CS.quantity)} units`,``,
+    `💰 *Pricing*`,`Unit (₦): ₦${fmtN(unitNGN)}`,`Unit ($): $${fmtN(unitNGN/rate,2)}`,`Total (₦): ₦${fmtN(totalNGN)}`,`Total ($): $${fmtN(totalNGN/rate,2)}`,``,
+    notes?`📝 Notes: ${notes}`:null,``,`_Via Puregold Prints Quote Calculator_`
+  ].filter(l=>l!==null).join('\n');
+  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════
+function doLogin(){
+  const v=document.getElementById('login-pwd').value;
+  const err=document.getElementById('login-err');
+  if(v===getPwd()){
+    err.style.display='none';
+    document.getElementById('login-pwd').value='';
+    renderAdmin();
+    navTo(4);
+  }else{err.style.display='block';}
+}
+
+function saveRate(){saveGlobal({exchangeRate:parseFloat(document.getElementById('rate-input').value)||1550});}
+
+function changePwd(){
+  const v=document.getElementById('new-pwd').value.trim();
+  if(!v){showToast('Enter a new password',true);return;}
+  setPwd(v);document.getElementById('new-pwd').value='';showToast('Password updated!');
+}
+
+function renderAdmin(){
+  const products=getProducts(),g=getGlobal();
+  document.getElementById('rate-input').value=g.exchangeRate||1550;
+  const list=document.getElementById('admin-list'),empty=document.getElementById('admin-empty');
+  if(!products.length){list.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  list.innerHTML=products.map((p,i)=>`
+    <div class="admin-product-card">
+      <div class="apc-header">
+        <div class="apc-name">${p.icon} ${p.name} <span style="font-size:10px;color:var(--muted);background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;">${p.pricingModel}</span></div>
+        <div class="apc-actions">
+          <button class="btn btn-green btn-sm" onclick="openEditModal(${i})">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">🗑️</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">${p.desc||''}</div>
+      ${p.pricingModel==='tiered'?`<div class="tier-pricing">${['standard','premium','luxury'].map(tk=>{const t=p.tiers[tk];if(!t||!t.cost)return'';return`<div class="tier-price-box"><h4>${tk}</h4><div style="font-size:11px;margin-bottom:2px;">Cost: <strong>₦${fmtN(t.cost)}</strong></div><div style="font-size:11px;margin-bottom:2px;">Margin: <strong>${t.margin}%</strong></div><div style="font-size:11px;color:var(--gold);">Sell: ₦${fmtN(t.cost*(1+t.margin/100))}/unit</div></div>`;}).join('')}</div>`:`<div style="font-size:12px;margin-top:8px;">Base cost: <strong>₦${fmtN(p.baseCostPrice||0)}</strong> · Margin: <strong>${p.margin||0}%</strong>${p.baseDesc?` · <span style="color:var(--muted);">${p.baseDesc}</span>`:''}</div>`}
+    </div>`).join('');
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete this product?'))return;
+  const updated=getProducts().filter(p=>p.id!==id);
+  saveProducts(updated);renderAdmin();showToast('Deleted');
+}
+
+// ════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════
+let MS={editIdx:null,imgs:{card:null,s:null,p:null,l:null,base:null},optGroups:[],currentUploadKey:null};
+
+function onModelChange(){
+  const model=document.getElementById('m-model').value;
+  document.getElementById('model-hint-tiered').style.display=model==='tiered'?'block':'none';
+  document.getElementById('model-hint-layered').style.display=model==='layered'?'block':'none';
+}
+
+function modalTab(name,btn){
+  ['basic','pricing','options','images'].forEach(t=>{document.getElementById('mtab-'+t).style.display=t===name?'block':'none';});
+  document.querySelectorAll('.modal-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(name==='pricing')syncPricingTab();
+  if(name==='options'){syncOptionsHint();renderModalOptGroups();}
+  if(name==='images')renderImagesTab();
+}
+
+function syncPricingTab(){
+  const model=document.getElementById('m-model').value;
+  document.getElementById('m-tiered-pricing').style.display=model==='tiered'?'block':'none';
+  document.getElementById('m-layered-pricing').style.display=model==='layered'?'block':'none';
+}
+
+function syncOptionsHint(){
+  const model=document.getElementById('m-model').value;
+  document.getElementById('m-options-hint').textContent=model==='layered'
+    ?'Each group is a customer choice that adds to the base price. Set a cost price per option.'
+    :'Decorative options (Size, Finish etc.) captured in the quote — included in the tier price already.';
+}
+
+function toggleQtyConfig(){
+  const v=document.getElementById('m-qtype').value;
+  document.getElementById('m-qtiers-wrap').style.display=v==='tiered'?'block':'none';
+  document.getElementById('m-qslider-wrap').style.display=v==='slider'?'block':'none';
+}
+
+function clearModal(){
+  ['m-name','m-icon','m-desc','m-qtiers','m-s-cost','m-s-margin','m-s-desc','m-p-cost','m-p-margin','m-p-desc','m-l-cost','m-l-margin','m-l-desc','m-base-cost','m-base-margin','m-base-desc','m-qmin','m-qmax','m-qstep'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-icon').value='🖨️';
+  document.getElementById('m-model').value='tiered';
+  document.getElementById('m-qtype').value='typed';
+  MS={editIdx:null,imgs:{card:null,s:null,p:null,l:null,base:null},optGroups:[],currentUploadKey:null};
+  toggleQtyConfig();onModelChange();
+}
+
+function openAddModal(){
+  clearModal();
+  document.getElementById('modal-h2').textContent='Add New Product';
+  modalTab('basic',document.querySelector('.modal-tab'));
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function openEditModal(i){
+  clearModal();MS.editIdx=i;
+  const p=getProducts()[i];
+  document.getElementById('modal-h2').textContent='Edit Product';
+  document.getElementById('m-name').value=p.name;
+  document.getElementById('m-icon').value=p.icon;
+  document.getElementById('m-desc').value=p.desc||'';
+  document.getElementById('m-model').value=p.pricingModel||'tiered';
+  document.getElementById('m-qtype').value=p.qtyType||'typed';
+  document.getElementById('m-qmin').value=p.qtyMin||'';
+  document.getElementById('m-qtiers').value=(p.qtyTiers||[]).join(',');
+  document.getElementById('m-qmax').value=p.qtySliderMax||'';
+  document.getElementById('m-qstep').value=p.qtyStep||'';
+  toggleQtyConfig();onModelChange();
+  const tk={s:'standard',p:'premium',l:'luxury'};
+  Object.entries(tk).forEach(([k,name])=>{const t=p.tiers[name]||{};document.getElementById(`m-${k}-cost`).value=t.cost||'';document.getElementById(`m-${k}-margin`).value=t.margin||'';document.getElementById(`m-${k}-desc`).value=t.desc||'';});
+  document.getElementById('m-base-cost').value=p.baseCostPrice||'';
+  document.getElementById('m-base-margin').value=p.margin||'';
+  document.getElementById('m-base-desc').value=p.baseDesc||'';
+  MS.imgs={card:p.cardImage||null,s:p.tiers?.standard?.image||null,p:p.tiers?.premium?.image||null,l:p.tiers?.luxury?.image||null,base:p.baseImage||null};
+  MS.optGroups=JSON.parse(JSON.stringify(p.pricingModel==='layered'?(p.pricedOptionGroups||[]):(p.optionGroups||[])));
+  modalTab('basic',document.querySelector('.modal-tab'));
+  document.getElementById('product-modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('product-modal').classList.remove('open');}
+
+function triggerUpload(key){MS.currentUploadKey=key;document.getElementById('file-upload').click();}
+
+function handleFileUpload(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const key=MS.currentUploadKey;
+    if(key.startsWith('layer_')){
+      const parts=key.split('_'),gi=parseInt(parts[1]),lbl=parts.slice(2).join('_');
+      if(!MS.optGroups[gi].layerImages)MS.optGroups[gi].layerImages={};
+      MS.optGroups[gi].layerImages[lbl]=reader.result;
+      renderImagesTab();
+    }else{MS.imgs[key]=reader.result;updateImgPreviews();renderImagesTab();}
+  };
+  reader.readAsDataURL(file);e.target.value='';
+}
+
+function clearImg(key){MS.imgs[key]=null;updateImgPreviews();renderImagesTab();}
+
+function updateImgPreviews(){
+  const prev=document.getElementById('prev-card');
+  const img=document.getElementById('previmg-card');
+  const clr=document.getElementById('clear-card');
+  if(!prev)return;
+  if(MS.imgs.card){prev.classList.add('has-img');img.src=MS.imgs.card;img.style.display='block';prev.querySelector('.img-ph').style.display='none';clr.style.display='inline-flex';}
+  else{prev.classList.remove('has-img');img.style.display='none';prev.querySelector('.img-ph').style.display='block';clr.style.display='none';}
+}
+
+function renderImagesTab(){
+  const model=document.getElementById('m-model').value;
+  const tierDiv=document.getElementById('m-tier-images'),layerDiv=document.getElementById('m-layer-images');
+  if(!tierDiv)return;
+  if(model==='tiered'){
+    tierDiv.innerHTML=`<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;">Tier Images</div>`+[{k:'s',n:'Standard 🥉'},{k:'p',n:'Premium 🥈'},{k:'l',n:'Luxury 🥇'}].map(t=>uploaderHTML(t.k,t.n,MS.imgs[t.k])).join('');
+    layerDiv.innerHTML=MS.optGroups.length?`<div style="font-size:13px;font-weight:700;color:var(--gold);margin:14px 0 10px;">Option Layer Images</div>`+MS.optGroups.map((g,gi)=>g.options.length?`<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;margin-bottom:6px;">${g.label||'Group '+(gi+1)}</div>${(g.options||[]).map(opt=>{const lbl=opt.label||opt;return uploaderHTML(`layer_${gi}_${lbl}`,lbl,g.layerImages?.[lbl]||null,true);}).join('')}</div>`:'').join(''):'';
+  }else{
+    tierDiv.innerHTML=`<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;">Base Image</div>`+uploaderHTML('base','Base product image (always shown)',MS.imgs.base);
+    layerDiv.innerHTML=MS.optGroups.length?`<div style="font-size:13px;font-weight:700;color:var(--gold);margin:14px 0 10px;">Option Layer Images</div>`+MS.optGroups.map((g,gi)=>g.options.length?`<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;margin-bottom:6px;">${g.label||'Group '+(gi+1)}</div>${(g.options||[]).map(opt=>{const lbl=opt.label||opt;return uploaderHTML(`layer_${gi}_${lbl}`,lbl,g.layerImages?.[lbl]||null,true);}).join('')}</div>`:'').join(''):'';
+  }
+  updateImgPreviews();
+}
+
+function uploaderHTML(key,label,src,small=false){
+  const sz=small?48:58;
+  return`<div class="img-uploader"><div class="img-preview${src?' has-img':''}" onclick="triggerUpload('${key}')" style="width:${sz}px;height:${sz}px;">${src?`<img src="${src}">`:`<span class="img-ph" style="font-size:${small?18:22}px;">🖼</span>`}</div><div class="img-meta"><label>${label}</label><div class="img-actions"><button class="btn btn-ghost btn-sm" onclick="triggerUpload('${key}')" style="font-size:11px;padding:3px 8px;">${src?'↑ Replace':'+ Upload'}</button>${src?`<button class="btn btn-danger btn-sm" onclick="clearLayerImg('${key}')" style="font-size:11px;padding:3px 8px;">✕</button>`:''}</div></div></div>`;
+}
+
+function clearLayerImg(key){
+  if(key.startsWith('layer_')){const parts=key.split('_'),gi=parseInt(parts[1]),lbl=parts.slice(2).join('_');if(MS.optGroups[gi]?.layerImages)delete MS.optGroups[gi].layerImages[lbl];renderImagesTab();}
+  else clearImg(key);
+}
+
+function addOptionGroup(){
+  const model=document.getElementById('m-model').value;
+  MS.optGroups.push(model==='layered'?{label:'',required:true,options:[],layerImages:{}}:{label:'',options:[],layerImages:{}});
+  renderModalOptGroups();
+}
+
+function renderModalOptGroups(){
+  const model=document.getElementById('m-model').value;
+  const container=document.getElementById('m-options-list');
+  if(!container)return;
+  container.innerHTML=MS.optGroups.map((g,gi)=>{
+    const isL=model==='layered';
+    const optsHTML=(g.options||[]).map((opt,oi)=>{const lbl=opt.label||opt;return`<div class="opt-tag">${lbl}${isL?` <small style="color:var(--muted);">₦${opt.costPrice||0}</small>`:''}<button onclick="removeOpt(${gi},${oi})">×</button></div>`;}).join('');
+    return`<div class="og-box"><div class="og-row"><input placeholder="Group label e.g. Paper Type" value="${g.label||''}" oninput="MS.optGroups[${gi}].label=this.value" style="flex:1;">${isL?`<label style="display:flex;align-items:center;gap:5px;margin:0;white-space:nowrap;cursor:pointer;font-size:12px;"><input type="checkbox" ${g.required?'checked':''} onchange="MS.optGroups[${gi}].required=this.checked"> Req</label>`:''}<button class="btn btn-danger btn-sm" onclick="removeGroup(${gi})">✕</button></div><div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">${optsHTML}</div><div style="display:flex;gap:7px;"><input id="new-opt-${gi}" placeholder="${isL?'Option label':'Add value'}" style="flex:1;" onkeydown="if(event.key==='Enter'){addOpt(${gi});event.preventDefault();}">${isL?`<input type="number" id="new-opt-cost-${gi}" placeholder="Cost ₦" style="width:85px;">`:''}<button class="btn btn-green btn-sm" onclick="addOpt(${gi})">+ Add</button></div></div>`;
+  }).join('');
+}
+
+function removeGroup(gi){MS.optGroups.splice(gi,1);renderModalOptGroups();}
+
+function addOpt(gi){
+  const model=document.getElementById('m-model').value;
+  const inp=document.getElementById(`new-opt-${gi}`),lbl=inp.value.trim();
+  if(!lbl)return;
+  if(model==='layered'){const ci=document.getElementById(`new-opt-cost-${gi}`);MS.optGroups[gi].options.push({label:lbl,costPrice:parseFloat(ci?.value)||0});if(ci)ci.value='';}
+  else MS.optGroups[gi].options.push(lbl);
+  inp.value='';renderModalOptGroups();
+}
+
+function removeOpt(gi,oi){MS.optGroups[gi].options.splice(oi,1);renderModalOptGroups();}
+
+function saveProduct(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){showToast('Product name required',true);return;}
+  const model=document.getElementById('m-model').value;
+  const product={
+    id:MS.editIdx!==null?getProducts()[MS.editIdx].id:name.toLowerCase().replace(/[^a-z0-9]/g,'_')+'_'+Date.now(),
+    name,icon:document.getElementById('m-icon').value||'🖨️',
+    desc:document.getElementById('m-desc').value.trim(),
+    cardImage:MS.imgs.card||undefined,pricingModel:model,
+    tiers:{
+      standard:{cost:parseFloat(document.getElementById('m-s-cost').value)||0,margin:parseFloat(document.getElementById('m-s-margin').value)||30,desc:document.getElementById('m-s-desc').value,image:MS.imgs.s||undefined},
+      premium:{cost:parseFloat(document.getElementById('m-p-cost').value)||0,margin:parseFloat(document.getElementById('m-p-margin').value)||35,desc:document.getElementById('m-p-desc').value,image:MS.imgs.p||undefined},
+      luxury:{cost:parseFloat(document.getElementById('m-l-cost').value)||0,margin:parseFloat(document.getElementById('m-l-margin').value)||40,desc:document.getElementById('m-l-desc').value,image:MS.imgs.l||undefined},
+    },
+    baseCostPrice:parseFloat(document.getElementById('m-base-cost').value)||0,
+    margin:parseFloat(document.getElementById('m-base-margin').value)||35,
+    baseDesc:document.getElementById('m-base-desc').value||'',
+    baseImage:MS.imgs.base||undefined,
+    pricedOptionGroups:model==='layered'?MS.optGroups.filter(g=>g.label):[],
+    optionGroups:model==='tiered'?MS.optGroups.filter(g=>g.label).map(g=>({...g,options:(g.options||[]).map(o=>typeof o==='string'?o:o.label)})):[],
+    qtyType:document.getElementById('m-qtype').value,
+    qtyMin:parseInt(document.getElementById('m-qmin').value)||1,
+    qtyTiers:document.getElementById('m-qtiers').value.split(',').map(x=>parseInt(x.trim())).filter(Boolean),
+    qtySliderMax:parseInt(document.getElementById('m-qmax').value)||5000,
+    qtyStep:parseInt(document.getElementById('m-qstep').value)||50,
+  };
+  const products=getProducts();
+  if(MS.editIdx!==null){products[MS.editIdx]=product;showToast('Product updated!');}
+  else{products.push(product);showToast('Product added!');}
+  saveProducts(products);closeModal();renderAdmin();
+}
+
+// ════════════════════════════════════════
+// HOME CHIPS & TOAST
+// ════════════════════════════════════════
+function renderHomeChips(){
+  const chips=document.getElementById('home-chips');
+  if(!chips)return;
+  chips.innerHTML=getProducts().map(p=>`<div class="service-chip">${p.icon} ${p.name}</div>`).join('');
+}
+
+function showToast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast'+(err?' err':'');
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// safe — modal listener attached after DOM parsed
+const _modal=document.getElementById('product-modal');
+if(_modal) _modal.addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ════════════════════════════════════════
+  // DEFAULT PRODUCTS
+  // ════════════════════════════════════════
+  const PRODUCT_CATALOG_VERSION = 'puregold-seed-2026-04-20';
+  const SEEDED_PRODUCTS = [
+
+  // ── 1. FLYERS ──────────────────────────────────────────────
+  {
+    id: 'flyers',
+    name: 'Flyers',
+    icon: '🖨️',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Full colour offset printing. MOQ: 5,000 pieces.',
+    tiers: {
+      standard: {
+        cost: 25,
+        margin: 92,
+        desc: 'A6 Single Side · 80gsm · Standard gloss finish'
+      },
+      premium: {
+        cost: 33,
+        margin: 91,
+        desc: 'A5 Single Side · 130gsm · Gloss lamination'
+      },
+      luxury: {
+        cost: 33,
+        margin: 91,
+        desc: 'A4 Double Side · 170gsm+ · Gloss or matte upgrade'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['A6', 'A5', 'A4'] },
+      { label: 'Sides', options: ['Single Side', 'Double Side'] },
+      { label: 'Finish', options: ['Standard Gloss', 'Matte Upgrade (+20–30%)'] }
+    ]
+  },
+
+  // ── 2. HANDBILLS ───────────────────────────────────────────
+  {
+    id: 'handbills',
+    name: 'Handbills',
+    icon: '📄',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Low gsm (80–100gsm), single side only, no lamination. Mass distribution. MOQ: 5,000 pieces.',
+    tiers: {
+      standard: {
+        cost: 4,
+        margin: 175,
+        desc: 'A6 · Single side · No lamination (most common)'
+      },
+      premium: {
+        cost: 7,
+        margin: 157,
+        desc: 'A5 · Single side · No lamination'
+      },
+      luxury: {
+        cost: 11,
+        margin: 145,
+        desc: 'A4 · Single side · No lamination'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['A6 (Most Common)', 'A5', 'A4'] }
+    ]
+  },
+
+  // ── 3. PRODUCT LABELS ──────────────────────────────────────
+  {
+    id: 'labels',
+    name: 'Product Labels',
+    icon: '🏷️',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Full colour, gloss or matte. MOQ: 5,000 units.',
+    tiers: {
+      standard: {
+        cost: 6,
+        margin: 167,
+        desc: 'Paper Label — Small (up to 5×5cm)'
+      },
+      premium: {
+        cost: 10,
+        margin: 150,
+        desc: 'Paper Label — Medium (5×10cm)'
+      },
+      luxury: {
+        cost: 12,
+        margin: 150,
+        desc: 'PVC / Waterproof Label — Small (up to 5×5cm)'
+      }
+    },
+    optionGroups: [
+      { label: 'Material', options: ['Paper / Gloss', 'Paper / Matte', 'PVC / Waterproof'] },
+      { label: 'Size', options: ['Small (up to 5×5cm)', 'Medium (5×10cm)', 'Custom / Die-cut (+20–35%)'] },
+      { label: 'Special', options: ['Standard', 'Barcode / QR Code', 'Barcode + Full Colour Design'] }
+    ]
+  },
+
+  // ── 4. PRODUCT BOXES (BRANDED) ─────────────────────────────
+  {
+    id: 'product_boxes',
+    name: 'Product Boxes',
+    icon: '📦',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Full colour + matte lamination. Track A (we supply + print). MOQ: 500 units.',
+    tiers: {
+      standard: {
+        cost: 350,
+        margin: 100,
+        desc: 'Small Retail Box ~100×60×30mm — soap, cosmetics, accessories'
+      },
+      premium: {
+        cost: 800,
+        margin: 125,
+        desc: 'Medium Product Box ~300×200×100mm — shoes, clothing, electronics'
+      },
+      luxury: {
+        cost: 1500,
+        margin: 133,
+        desc: 'Premium / Gift Box — soft touch, rigid, ribbon or magnetic closure'
+      }
+    },
+    optionGroups: [
+      { label: 'Finish', options: ['Matte Lamination', 'Gloss / Spot UV (+15–25%)', 'Soft Touch Lamination'] },
+      { label: 'Add-ons', options: ['None', 'Foil Stamping (+₦100–300/unit)', 'Embossing (+₦200–500/unit)', 'Magnetic Closure (+₦300–600/unit)'] },
+      { label: 'Track', options: ['Track A — We Supply + Print', 'Track B — Client Supplies Box, We Brand Only'] }
+    ]
+  },
+
+  // ── 5. CORRUGATED CARTONS ──────────────────────────────────
+  {
+    id: 'cartons',
+    name: 'Corrugated Cartons',
+    icon: '📫',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Produced to spec. Plain brown kraft or flexo printed. MOQ: 100 pcs (small/medium), 500 pcs (large).',
+    tiers: {
+      standard: {
+        cost: 350,
+        margin: 100,
+        desc: 'Small Carton ~20×15×10cm — Single wall 3-ply'
+      },
+      premium: {
+        cost: 800,
+        margin: 100,
+        desc: 'Medium Carton ~40×30×25cm — Single wall 3-ply'
+      },
+      luxury: {
+        cost: 1200,
+        margin: 100,
+        desc: 'Large Carton ~60×40×40cm — Double wall 5-ply'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['Small (~20×15×10cm)', 'Medium (~40×30×25cm)', 'Large (~60×40×40cm)'] },
+      { label: 'Wall Type', options: ['Single Wall 3-ply', 'Double Wall 5-ply (+35–40%)'] },
+      { label: 'Print', options: ['Plain / Unprinted', '1-Colour Flexo Branding', '2-Colour Flexo Branding'] }
+    ]
+  },
+
+  // ── 6. NYLON BAGS ──────────────────────────────────────────
+  {
+    id: 'nylon_bags',
+    name: 'Nylon Bags',
+    icon: '🛍️',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Screen printed. MOQ: 1,000 pieces. ⚠️ Kenya clients: plastic bags are BANNED — redirect to paper or non-woven bags.',
+    tiers: {
+      standard: {
+        cost: 50,
+        margin: 120,
+        desc: 'Small (8×11") — pharmacy, small retail, food · 1-colour screen'
+      },
+      premium: {
+        cost: 120,
+        margin: 117,
+        desc: 'Medium (15×19.5") — supermarkets, clothing, retail · 1-colour screen'
+      },
+      luxury: {
+        cost: 200,
+        margin: 115,
+        desc: 'Large (17.5×22") or X-Large (22×26") · 1-colour screen'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['Small (8×11")', 'Medium (15×19.5")', 'Large (17.5×22")', 'X-Large (22×26")'] },
+      { label: 'Colours', options: ['1-Colour Screen Print', '2-Colour Screen Print (+25–35%)', 'Full Colour Flexo 5,000+ pcs (+40–60%)'] }
+    ]
+  },
+
+  // ── 7. SACHET NYLON ────────────────────────────────────────
+  {
+    id: 'sachet_nylon',
+    name: 'Sachet / Pure Water Nylon',
+    icon: '💧',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Flat printed roll. Priced per KG. MOQ: 50kg (~20,000 pcs). Client\'s machine handles forming and sealing.',
+    tiers: {
+      standard: {
+        cost: 4500,
+        margin: 78,
+        desc: 'Plain / Unprinted — 50kg (~20,000 pcs)'
+      },
+      premium: {
+        cost: 6500,
+        margin: 85,
+        desc: '1-Colour Printed — 50kg (~20,000 pcs)'
+      },
+      luxury: {
+        cost: 7500,
+        margin: 87,
+        desc: '2-Colour Printed — 50kg (~20,000 pcs)'
+      }
+    },
+    optionGroups: [
+      { label: 'Print Colours', options: ['Plain / Unprinted', '1-Colour Print', '2-Colour Print', '4-Colour Print (+20–30% on 2-colour)'] },
+      { label: 'Quantity (kg)', options: ['50kg (~20,000 pcs)', '100kg (~40,000 pcs)', '500kg (~200,000 pcs)', '1,000kg (~400,000 pcs)'] }
+    ]
+  },
+
+  // ── 8. BREAD NYLON ─────────────────────────────────────────
+  {
+    id: 'bread_nylon',
+    name: 'Bread Nylon',
+    icon: '🍞',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Flat printed roll. Priced per KG. MOQ: 20kg (~5,000 pcs). Client\'s machine handles bagging.',
+    tiers: {
+      standard: {
+        cost: 5500,
+        margin: 82,
+        desc: '1-Colour Printed — 20kg (~5,000 pcs)'
+      },
+      premium: {
+        cost: 6500,
+        margin: 85,
+        desc: '2-Colour Printed — 20kg (~5,000 pcs)'
+      },
+      luxury: {
+        cost: 8000,
+        margin: 88,
+        desc: '4-Colour Printed — 50kg (~12,500 pcs) — Premium Bakery Branding'
+      }
+    },
+    optionGroups: [
+      { label: 'Print Colours', options: ['1-Colour', '2-Colour', '4-Colour (Premium)'] },
+      { label: 'Quantity (kg)', options: ['20kg (~5,000 pcs)', '50kg (~12,500 pcs)', '100kg (~25,000 pcs)', '500kg (~125,000 pcs)', '1,000kg (~250,000 pcs)'] }
+    ]
+  },
+
+  // ── 9. BANNERS & ROLLUP STANDS ─────────────────────────────
+  {
+    id: 'banners',
+    name: 'Banners & Rollup Stands',
+    icon: '🎌',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Large format print. MOQ: 1 piece. Priced per unit.',
+    tiers: {
+      standard: {
+        cost: 8000,
+        margin: 125,
+        desc: 'Flex Banner or X-Banner — standard flex, per sqft basis'
+      },
+      premium: {
+        cost: 18000,
+        margin: 111,
+        desc: 'Rollup / Retractable Banner — 33×81" (85×200cm) with stand & carry bag'
+      },
+      luxury: {
+        cost: 45000,
+        margin: 111,
+        desc: 'Backdrop / Media Wall — 3×2m flex + frame, or fabric media wall'
+      }
+    },
+    optionGroups: [
+      { label: 'Type', options: ['Flex Banner', 'Rollup / Retractable Stand', 'X-Banner / L-Banner', 'Backdrop + Frame', 'Feather Flag'] },
+      { label: 'Size', options: ['Small / A3–A4', 'Standard 3×2ft / 33×81"', 'Large 6×4ft / 120×200cm', 'Backdrop 3×2m', 'Backdrop 6×3m'] },
+      { label: 'Flex Material', options: ['Standard Flex', 'Premium Flex', 'Backlit Flex'] }
+    ]
+  },
+
+  // ── 10. PAPER SHOPPING BAGS ────────────────────────────────
+  {
+    id: 'paper_bags',
+    name: 'Paper Shopping Bags',
+    icon: '🛒',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Produced + printed. MOQ: 200 pieces. Two tracks: Kraft (eco/budget) and Art Card (luxury). Great for Kenya clients (plastic ban).',
+    tiers: {
+      standard: {
+        cost: 200,
+        margin: 125,
+        desc: 'Small (A5) Kraft — Twisted rope handle · 1-colour'
+      },
+      premium: {
+        cost: 380,
+        margin: 111,
+        desc: 'Medium (A4) Kraft — Twisted rope handle · 1-colour'
+      },
+      luxury: {
+        cost: 700,
+        margin: 129,
+        desc: 'Art Card / Luxury — 250–300gsm, laminated, ribbon or rope handle'
+      }
+    },
+    optionGroups: [
+      { label: 'Material', options: ['Kraft Paper (Eco / Budget)', 'Art Card / Luxury (250–300gsm)'] },
+      { label: 'Size', options: ['Small (A5)', 'Medium (A4)', 'Large (A3)'] },
+      { label: 'Print', options: ['1-Colour', 'Full Colour'] },
+      { label: 'Add-ons', options: ['None', 'Foil Stamping (+₦100–300/unit)'] }
+    ]
+  },
+
+  // ── 11. PRICE / PRODUCT TAGS ───────────────────────────────
+  {
+    id: 'price_tags',
+    name: 'Price & Product Tags',
+    icon: '🔖',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: '350–600gsm card. Die-cut, hole punched, optional string. MOQ: 2,000 pieces.',
+    tiers: {
+      standard: {
+        cost: 12,
+        margin: 150,
+        desc: 'Small (5×3cm) — 350–400gsm, full colour, matte/gloss'
+      },
+      premium: {
+        cost: 20,
+        margin: 140,
+        desc: 'Medium (9×5cm) — 350–400gsm, full colour, matte/gloss'
+      },
+      luxury: {
+        cost: 45,
+        margin: 133,
+        desc: 'Premium Fashion Tag (9×5cm) — 500–600gsm, double sided, soft touch + string'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['Small (5×3cm)', 'Medium (9×5cm)', 'Large (12×7cm)'] },
+      { label: 'Type', options: ['Standard Hang Tag', 'Premium Fashion Tag (thick + string)'] },
+      { label: 'Add-ons', options: ['None', 'Foil Stamping (+₦30–80/unit)', 'Spot UV (+₦20–50/unit)', 'Die-cut Custom Shape (+20–30%)'] }
+    ]
+  },
+
+  // ── 12. TOTE BAGS ──────────────────────────────────────────
+  {
+    id: 'tote_bags',
+    name: 'Tote Bags',
+    icon: '👜',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'MOQ: 200 pieces. Canvas/Cotton (premium) or Non-Woven (budget). Track A (we supply + brand) or Track B (client supplies).',
+    tiers: {
+      standard: {
+        cost: 900,
+        margin: 122,
+        desc: 'Non-Woven Tote — Events, NGOs, corporate giveaways · 1-colour screen'
+      },
+      premium: {
+        cost: 3000,
+        margin: 117,
+        desc: 'Canvas/Cotton Tote (~38×42cm) — 1-colour screen print'
+      },
+      luxury: {
+        cost: 3700,
+        margin: 116,
+        desc: 'Canvas/Cotton Tote — Full Colour DTF print'
+      }
+    },
+    optionGroups: [
+      { label: 'Material', options: ['Non-Woven (Budget)', 'Canvas / Cotton (Premium)'] },
+      { label: 'Branding Method', options: ['1-Colour Screen Print', '2-Colour Screen Print (+25–35%)', 'Full Colour DTF (any design)'] },
+      { label: 'Track', options: ['Track A — We Supply + Brand', 'Track B — Client Supplies, We Brand Only'] }
+    ]
+  },
+
+  // ── 13. CAKE / PIZZA BOXES ─────────────────────────────────
+  {
+    id: 'food_boxes',
+    name: 'Cake & Pizza Boxes',
+    icon: '🎂',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Food-grade board. MOQ: 500 pieces. All food-grade material as standard.',
+    tiers: {
+      standard: {
+        cost: 400,
+        margin: 125,
+        desc: 'Pizza Box 8" — Corrugated food-grade, full colour flexo'
+      },
+      premium: {
+        cost: 700,
+        margin: 129,
+        desc: 'Pizza Box 12" or Cake Box Medium (8×8×4") — Full colour'
+      },
+      luxury: {
+        cost: 500,
+        margin: 120,
+        desc: 'Cake Box — 350–400gsm art card, full colour offset, laminated'
+      }
+    },
+    optionGroups: [
+      { label: 'Type', options: ['Pizza Box', 'Cake Box'] },
+      { label: 'Size', options: ['8" / Small (6×6×4")', '10" / Medium (8×8×4")', '12" / Large (10×10×4")', '14" / XL (12×12×6")'] },
+      { label: 'Add-ons', options: ['None', 'Window Cut (+₦80–180/unit)', 'Foil / Spot UV (+₦100–250/unit)'] }
+    ]
+  },
+
+  // ── 14. PP WOVEN SACKS (RICE / FLOUR / CEMENT) ─────────────
+  {
+    id: 'pp_sacks',
+    name: 'PP Woven Sacks',
+    icon: '🌾',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Rice, flour, garri, cement, fertilizer bags. MOQ: 1,000 pieces. Plain woven → Laminated → BOPP HD print.',
+    tiers: {
+      standard: {
+        cost: 180,
+        margin: 122,
+        desc: '5kg Plain PP Woven — Food grade, 1–2 colour flexo print'
+      },
+      premium: {
+        cost: 380,
+        margin: 132,
+        desc: '10–25kg Laminated PP — Full colour, food or industrial'
+      },
+      luxury: {
+        cost: 650,
+        margin: 135,
+        desc: '50kg Laminated PP — Full colour / BOPP HD print (+30–50%)'
+      }
+    },
+    optionGroups: [
+      { label: 'Product Type', options: ['Food (Rice / Flour / Garri / Beans)', 'Industrial (Cement / Sand / Fertilizer)'] },
+      { label: 'Capacity', options: ['5kg', '10kg', '25kg', '50kg'] },
+      { label: 'Material', options: ['Plain PP Woven (1–2 colour)', 'Laminated PP (Full colour)', 'BOPP HD Print (+30–50%)'] },
+      { label: 'Bag Style', options: ['Standard Open Top', 'Block Bottom Valve (Cement)'] }
+    ]
+  },
+
+  // ── 15. EXPORT CARTONS ─────────────────────────────────────
+  {
+    id: 'export_cartons',
+    name: 'Export Cartons',
+    icon: '🚢',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Heavy duty corrugated. MOQ: 500 pieces. Agro-export, pharma, electronics, FMCG. Always confirm dimensions before quoting.',
+    tiers: {
+      standard: {
+        cost: 650,
+        margin: 131,
+        desc: 'Small (≤30×20×20cm) — Single wall 3-ply, plain kraft'
+      },
+      premium: {
+        cost: 1000,
+        margin: 135,
+        desc: 'Medium (40×30×25cm) — Double wall 5-ply, plain or 1-colour flexo'
+      },
+      luxury: {
+        cost: 1800,
+        margin: 136,
+        desc: 'Large (60×40×40cm) or Specialist — Ventilated / Wax-coated / Telescopic'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['Small (≤30×20×20cm)', 'Medium (40×30×25cm)', 'Large (60×40×40cm)', 'XL (80×50×50cm+)'] },
+      { label: 'Wall Type', options: ['Single Wall 3-ply (Light goods)', 'Double Wall 5-ply (Heavy / Export grade)'] },
+      { label: 'Print', options: ['Plain / No Print', '1-Colour Flexo', '2-Colour Flexo'] },
+      { label: 'Specialist Type', options: ['Standard', 'Ventilated (Fresh produce)', 'Wax-Coated (Fish / Seafood)', 'Telescopic (Flowers)'] }
+    ]
+  },
+
+  // ── 16. CATALOGUES ─────────────────────────────────────────
+  {
+    id: 'catalogues',
+    name: 'Catalogues',
+    icon: '📒',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Full colour offset. Cover: 300gsm + lamination. Inner: 130–170gsm art paper. MOQ: 100 copies.',
+    tiers: {
+      standard: {
+        cost: 1800,
+        margin: 133,
+        desc: 'A5 · 8 pages · Saddle stitch'
+      },
+      premium: {
+        cost: 3800,
+        margin: 137,
+        desc: 'A4 · 16 pages · Saddle stitch'
+      },
+      luxury: {
+        cost: 7000,
+        margin: 136,
+        desc: 'A4 · 32 pages · Perfect bound (glued spine)'
+      }
+    },
+    optionGroups: [
+      { label: 'Size', options: ['A5', 'A4'] },
+      { label: 'Pages', options: ['8 pages', '16 pages', '32 pages', '48 pages'] },
+      { label: 'Binding', options: ['Saddle Stitch (stapled, up to 48pg)', 'Perfect Bound (glued spine, premium)'] },
+      { label: 'Cover Upgrade', options: ['Standard Matte/Gloss', 'Gloss Upgrade (+8–12%)', 'Spot UV on Cover (+15–25%)'] }
+    ]
+  },
+
+  // ── 17. FLEXIBLE POUCHES ───────────────────────────────────
+  {
+    id: 'pouches',
+    name: 'Flexible Pouches',
+    icon: '🧴',
+    pricingModel: 'tiered',
+    baseCostPrice: 0,
+    baseDesc: 'Food, supplements, cosmetics, beverages. MOQ: 500 pcs Track A. Cylinder/setup fee ₦25,000–80,000 one-time first order.',
+    tiers: {
+      standard: {
+        cost: 180,
+        margin: 133,
+        desc: 'OPP/PE Clear — Small (~100ml), 3-side seal, full colour'
+      },
+      premium: {
+        cost: 380,
+        margin: 132,
+        desc: 'Kraft Paper — Medium (~500ml) stand-up + zipper'
+      },
+      luxury: {
+        cost: 700,
+        margin: 136,
+        desc: 'Foil / Aluminium Laminate — Medium (~500ml) stand-up + zipper · High-barrier'
+      }
+    },
+    optionGroups: [
+      { label: 'Material', options: ['OPP/PE Clear (Budget)', 'Kraft Paper (Eco / Organic)', 'Foil / Aluminium Laminate (High-barrier)'] },
+      { label: 'Size', options: ['Small (~100ml / 7×10cm)', 'Medium (~250–500ml / 12×18cm)', 'Large (~1kg / 16×24cm)'] },
+      { label: 'Style', options: ['3-Side Seal (Flat, no zipper)', 'Stand-up Doypack + Zipper'] },
+      { label: 'Finish', options: ['Standard Gloss', 'Matte (+10–15%)', 'Spot UV (+15–25%)'] },
+      { label: 'Feature', options: ['Standard', 'Spout / Nozzle (liquids +₦200–400/unit)', 'Oxygen Barrier Upgrade (+20–30%)'] },
+      { label: 'Track', options: ['Track A — We Produce from Scratch', 'Track B — Client Supplies Blank, We Label Only'] }
+    ]
+  }
+
+];
+
+  function normalizeProduct(p){
+    return {
+      pricingModel:'tiered',
+      baseCostPrice:0,
+      margin:35,
+      baseDesc:'',
+      pricedOptionGroups:[],
+      optionGroups:[],
+      qtyType:'typed',
+      qtyMin:1,
+      qtyTiers:[],
+      qtySliderMax:5000,
+      qtyStep:50,
+      ...p
+    };
+  }
+
+  function defaultProducts(){
+    return SEEDED_PRODUCTS.map(normalizeProduct);
+  }
+
+  function ensureSeedCatalog(){
+    try{
+      if(localStorage.getItem('pg_catalog_version')!==PRODUCT_CATALOG_VERSION){
+        saveProducts(defaultProducts());
+        localStorage.setItem('pg_catalog_version',PRODUCT_CATALOG_VERSION);
+      }
+    }catch(e){}
+  }
+
+// ── INIT ──────────────────────────────
+(function init(){
+  // Admin route: ?admin in URL → go straight to login page
+  try{
+    const params=new URLSearchParams(window.location.search);
+    if(params.has('admin')){
+      navTo(3);
+      return; // skip normal home render
+    }
+  }catch(e){}
+
+  ensureSeedCatalog();
+
+  // Normal load — render home chips
+  renderHomeChips();
+})();
+</script>
+</body>
+</html>
