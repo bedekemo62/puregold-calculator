@@ -99,12 +99,15 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
 .product-card{border:2px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.03);overflow:hidden;display:flex;flex-direction:column;}
 .product-card:hover,.product-card:active{border-color:rgba(201,168,76,.4);}
 .product-card.selected{border-color:var(--gold);background:rgba(201,168,76,.1);}
+.product-card.custom-quote{border-style:dashed;background:rgba(26,74,46,.16);}
 .product-img-area{width:100%;height:96px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);overflow:hidden;}
 .product-img-area img{width:100%;height:100%;object-fit:contain;padding:8px;}
 .p-emoji{font-size:38px;}
 .product-info{padding:7px 8px 9px;text-align:center;}
 .p-name{font-size:12px;font-weight:600;line-height:1.3;}
 .selected-bar{background:var(--gold);color:var(--navy);text-align:center;font-size:10px;font-weight:700;padding:3px 0;}
+.product-search{margin-bottom:14px;}
+.product-search input{background:rgba(255,255,255,.09);border-color:rgba(201,168,76,.22);}
 
 /* ── TIERS ── */
 .tier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -139,7 +142,7 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
 .summary-total{display:flex;justify-content:space-between;align-items:center;padding:16px 0 0;margin-top:8px;border-top:2px solid rgba(201,168,76,.3);}
 .t-label{font-size:15px;font-weight:700;}
 .t-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--gold);}
-.currency-toggle{display:flex;gap:4px;background:rgba(0,0,0,.3);border-radius:8px;padding:4px;}
+.currency-toggle{display:flex;flex-wrap:wrap;gap:4px;background:rgba(0,0,0,.3);border-radius:8px;padding:4px;}
 .curr-btn{padding:5px 12px;border-radius:6px;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);}
 .curr-btn.active{background:var(--gold);color:var(--navy);}
 .discount-toggle{display:flex;align-items:center;gap:12px;background:rgba(26,74,46,.2);border:1px solid rgba(74,155,106,.3);border-radius:10px;padding:12px 16px;margin-top:12px;cursor:pointer;user-select:none;}
@@ -176,6 +179,10 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
 .apc-header{display:flex;justify-content:space-between;align-items:center;}
 .apc-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
 .apc-actions{display:flex;gap:6px;flex-wrap:wrap;}
+.rate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rate-field{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px;}
+.rate-field label{font-size:10px;color:var(--gold);margin-bottom:5px;}
+.rate-field input{padding:8px 10px;}
 .tier-pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
 .tier-price-box{background:rgba(0,0,0,.2);border-radius:8px;padding:10px;}
 .tier-price-box h4{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase;}
@@ -229,6 +236,14 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
   .step-connector{width:18px;}
   .apc-actions{flex-direction:column;align-items:flex-end;}
   .calc-viewer-layout{flex-direction:column!important;}
+  .currency-toggle{width:100%;margin-top:10px;}
+  .curr-btn{flex:1 1 calc(33.333% - 4px);padding:7px 6px;font-size:11px;}
+  .card-title{flex-wrap:wrap;}
+  .card-title>div[style*="margin-left:auto"]{margin-left:0!important;width:100%;}
+  .rate-grid{grid-template-columns:repeat(2,1fr);}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(115px,1fr));}
+  .summary-row,.summary-total{gap:12px;}
+  .s-val{max-width:58%;}
 }
 </style>
 </head>
@@ -322,8 +337,16 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
           <div class="card-title"><div class="icon">💱</div>Global Settings</div>
           <div class="form-row">
             <div class="form-group">
-              <label>USD → NGN Rate</label>
-              <input type="number" id="rate-input" placeholder="e.g. 1550" oninput="saveRate()">
+              <label>Currency Rates — NGN per 1 unit</label>
+              <div class="rate-grid" id="currency-rate-grid">
+                <div class="rate-field"><label>USD — US Dollar</label><input type="number" id="rate-USD" placeholder="1550" oninput="saveRate()"></div>
+                <div class="rate-field"><label>EUR — Euro</label><input type="number" id="rate-EUR" placeholder="1700" oninput="saveRate()"></div>
+                <div class="rate-field"><label>GBP — Pound</label><input type="number" id="rate-GBP" placeholder="1950" oninput="saveRate()"></div>
+                <div class="rate-field"><label>KES — Kenyan Shilling</label><input type="number" id="rate-KES" placeholder="12" oninput="saveRate()"></div>
+                <div class="rate-field"><label>GHS — Ghana Cedi</label><input type="number" id="rate-GHS" placeholder="115" oninput="saveRate()"></div>
+                <div class="rate-field"><label>ZAR — South African Rand</label><input type="number" id="rate-ZAR" placeholder="85" oninput="saveRate()"></div>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:6px;">Example: if 1 USD = ₦1550, enter 1550 for USD.</div>
             </div>
             <div class="form-group">
               <label>Change Admin Password</label>
@@ -475,6 +498,15 @@ label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bot
 // ════════════════════════════════════════
 const WHATSAPP = '2347073219655';
 const K_PRODUCTS='pg_products', K_GLOBAL='pg_global', K_PWD='pg_admin_pwd';
+const DEFAULT_CURRENCIES=[
+  {code:'NGN',symbol:'₦',rate:1,decimals:0},
+  {code:'USD',symbol:'$',rate:1550,decimals:2},
+  {code:'EUR',symbol:'€',rate:1700,decimals:2},
+  {code:'GBP',symbol:'£',rate:1950,decimals:2},
+  {code:'KES',symbol:'KSh',rate:12,decimals:2},
+  {code:'GHS',symbol:'GH₵',rate:115,decimals:2},
+  {code:'ZAR',symbol:'R',rate:85,decimals:2}
+];
 
 function getProducts(){
   try{
@@ -484,11 +516,26 @@ function getProducts(){
   }catch{return defaultProducts();}
 }
 function saveProducts(p){localStorage.setItem(K_PRODUCTS,JSON.stringify(p));}
-function getGlobal(){try{return JSON.parse(localStorage.getItem(K_GLOBAL))||{exchangeRate:1550};}catch{return{exchangeRate:1550};}}
+function defaultRates(){return Object.fromEntries(DEFAULT_CURRENCIES.filter(c=>c.code!=='NGN').map(c=>[c.code,c.rate]));}
+function getGlobal(){
+  const fallback={exchangeRate:1550,rates:defaultRates()};
+  try{
+    const saved=JSON.parse(localStorage.getItem(K_GLOBAL))||{};
+    const rates={...defaultRates(),...(saved.rates||{})};
+    if(saved.exchangeRate&&!saved.rates?.USD)rates.USD=saved.exchangeRate;
+    return {...fallback,...saved,rates,exchangeRate:rates.USD};
+  }catch{return fallback;}
+}
 function saveGlobal(g){localStorage.setItem(K_GLOBAL,JSON.stringify(g));}
 function getPwd(){return localStorage.getItem(K_PWD)||'puregold2024';}
 function setPwd(p){localStorage.setItem(K_PWD,p);}
 function fmtN(n,d=0){return Number(n).toLocaleString('en-NG',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function money(amountNGN,code=CS.currency){
+  const currency=DEFAULT_CURRENCIES.find(c=>c.code===code)||DEFAULT_CURRENCIES[0];
+  const rates=getGlobal().rates||defaultRates();
+  const value=code==='NGN'?amountNGN:amountNGN/(rates[code]||currency.rate||1);
+  return `${currency.symbol}${fmtN(value,currency.decimals)} ${currency.code}`;
+}
 
 function calcUnit(p,tier,opts,disc=0){
   if(p.pricingModel==='layered'){
@@ -513,6 +560,7 @@ function calcUnit(p,tier,opts,disc=0){
 // STATE — declared first so nothing crashes
 // ════════════════════════════════════════
 let CS={step:1,product:null,tier:null,options:{},quantity:0,currency:'NGN',discOn:false,discPct:0};
+let PRODUCT_SEARCH='';
 
 // ════════════════════════════════════════
 // PAGE NAVIGATION — TRUE PAGE STACK
@@ -550,6 +598,14 @@ function goCalc(){
 }
 
 function goContact(){navTo(2);}
+
+function requestCustomQuote(){
+  CS.product={id:'custom_quote',name:'Custom / Not Listed',icon:'✨',pricingModel:'custom'};
+  CS.tier=null;CS.options={};CS.quantity=1;
+  navTo(2);
+  const notes=document.getElementById('c-notes');
+  if(notes&&!notes.value)notes.placeholder='Tell us what you need printed, quantity, size, material, deadline, and delivery country.';
+}
 
 // ── SWIPE GESTURE ──────────────────────
 let touchStartX=0,touchStartY=0,swipeLocked=false;
@@ -641,12 +697,17 @@ function renderStepsBar(cur){
 
 // ── STEP 1 ─────────────────────────────
 function renderStep1(){
+  const query=PRODUCT_SEARCH.trim().toLowerCase();
   const products=getProducts();
+  const filtered=products.filter(p=>[p.name,p.desc,p.baseDesc,...(p.optionGroups||[]).flatMap(g=>[g.label,...(g.options||[])])].filter(Boolean).join(' ').toLowerCase().includes(query));
   document.getElementById('calc-step-1').innerHTML=`
     <div class="card">
       <div class="card-title"><div class="icon">📋</div>Choose a Product</div>
+      <div class="product-search">
+        <input id="product-search-input" value="${PRODUCT_SEARCH.replace(/"/g,'&quot;')}" placeholder="Search products, e.g. bags, labels, cartons..." oninput="setProductSearch(this.value)">
+      </div>
       <div class="product-grid">
-        ${products.map(p=>{
+        ${filtered.map(p=>{
           const img=p.cardImage||p.tiers?.standard?.image||p.tiers?.premium?.image||p.baseImage;
           const sel=CS.product?.id===p.id;
           return`<div class="product-card${sel?' selected':''}" onclick="selectProduct('${p.id}')">
@@ -655,13 +716,25 @@ function renderStep1(){
             ${sel?`<div class="selected-bar">✓ Selected</div>`:''}
           </div>`;
         }).join('')}
+        <div class="product-card custom-quote" onclick="requestCustomQuote()">
+          <div class="product-img-area"><span class="p-emoji">✨</span></div>
+          <div class="product-info"><div class="p-name">Not listed? Request custom quote</div></div>
+        </div>
       </div>
+      ${!filtered.length?`<p style="font-size:12px;color:var(--muted);text-align:center;margin-top:14px;">No exact match. Use the custom quote option and describe what you need.</p>`:''}
     </div>
     <div class="swipe-hint">← swipe to go back · swipe to continue →</div>
     <div class="calc-nav">
       <button class="btn btn-ghost" onclick="navBack()">← Back</button>
       <button class="btn btn-gold" onclick="renderStep(2)" ${!CS.product?'disabled':''}>Next →</button>
     </div>`;
+}
+
+function setProductSearch(v){
+  PRODUCT_SEARCH=v;
+  renderStep1();
+  const input=document.getElementById('product-search-input');
+  if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length);}
 }
 
 function selectProduct(id){
@@ -845,8 +918,9 @@ function renderStep3(){
     qtyHTML=`<label>Quantity (minimum ${min})</label><div class="qty-input" style="margin-top:8px;"><button class="qty-btn" onclick="adjQty(-1)">−</button><input type="number" id="qty-typed" min="${min}" value="${val}" style="text-align:center;max-width:90px;" oninput="setQtyTyped()"><button class="qty-btn" onclick="adjQty(1)">+</button></div>`;
     if(!CS.quantity)CS.quantity=min;
   }
+  const qtyNote=p.baseDesc?`<p style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px;">${p.baseDesc}</p>`:'';
   document.getElementById('calc-step-3').innerHTML=`
-    <div class="card"><div class="card-title"><div class="icon">🔢</div>How Many Do You Need?</div>${qtyHTML}</div>
+    <div class="card"><div class="card-title"><div class="icon">🔢</div>How Many Do You Need?</div>${qtyHTML}${qtyNote}</div>
     <div class="swipe-hint">← swipe back · swipe to continue →</div>
     <div class="calc-nav">
       <button class="btn btn-ghost" onclick="renderStep(2)">← Back</button>
@@ -861,10 +935,11 @@ function setQtyTyped(){const v=parseInt(document.getElementById('qty-typed').val
 
 // ── STEP 4 ─────────────────────────────
 function renderStep4(){
-  const p=CS.product,g=getGlobal(),rate=g.exchangeRate||1550,disc=CS.discOn?CS.discPct:0;
+  const p=CS.product,disc=CS.discOn?CS.discPct:0;
   const unitNGN=calcUnit(p,CS.tier,CS.options,disc),totalNGN=unitNGN*CS.quantity;
-  const unit=CS.currency==='NGN'?`₦${fmtN(unitNGN)}`:`$${fmtN(unitNGN/rate,2)}`;
-  const total=CS.currency==='NGN'?`₦${fmtN(totalNGN)}`:`$${fmtN(totalNGN/rate,2)}`;
+  const unit=money(unitNGN);
+  const total=money(totalNGN);
+  const currencyButtons=DEFAULT_CURRENCIES.map(c=>`<button class="curr-btn${CS.currency===c.code?' active':''}" onclick="setCurr('${c.code}')">${c.symbol} ${c.code}</button>`).join('');
 
   const optRows=p.pricingModel==='layered'
     ?(p.pricedOptionGroups||[]).map(gr=>{
@@ -879,7 +954,7 @@ function renderStep4(){
   document.getElementById('calc-step-4').innerHTML=`
     <div class="card">
       <div class="card-title"><div class="icon">💰</div>Your Quote
-        <div style="margin-left:auto;"><div class="currency-toggle"><button class="curr-btn${CS.currency==='NGN'?' active':''}" onclick="setCurr('NGN')">₦ NGN</button><button class="curr-btn${CS.currency==='USD'?' active':''}" onclick="setCurr('USD')">$ USD</button></div></div>
+        <div style="margin-left:auto;"><div class="currency-toggle">${currencyButtons}</div></div>
       </div>
       <div class="summary-box">
         <div class="summary-row"><span class="s-label">Product</span><span class="s-val">${p.icon} ${p.name}</span></div>
@@ -902,7 +977,7 @@ function renderStep4(){
     </div>`;
 }
 
-function setCurr(c){CS.currency=c;renderStep4();}
+function setCurr(c){CS.currency=DEFAULT_CURRENCIES.some(x=>x.code===c)?c:'NGN';renderStep4();}
 function toggleDisc(){CS.discOn=!CS.discOn;renderStep4();}
 function setDisc(v){CS.discPct=parseFloat(v)||0;}
 
@@ -915,8 +990,19 @@ function submitQuote(){
   const email=document.getElementById('c-email').value.trim();
   const notes=document.getElementById('c-notes').value.trim();
   if(!name||!phone||!email){showToast('Please fill all required fields',true);return;}
-  const p=CS.product,g=getGlobal(),rate=g.exchangeRate||1550;
+  const p=CS.product||{id:'custom_quote',name:'Custom / Not Listed',icon:'✨',pricingModel:'custom'};
+  if(p.pricingModel==='custom'){
+    const msg=[
+      `🖨️ *CUSTOM PRINT QUOTE — PUREGOLD PRINTS*`,``,
+      `👤 *Customer*`,`Name: ${name}`,`Phone: ${phone}`,`Email: ${email}`,``,
+      `📋 *Request*`,`Product: ${p.icon} ${p.name}`,notes?`Details: ${notes}`:'Details: Customer needs follow-up for product details',``,
+      `_Via Puregold Prints Quote Calculator_`
+    ].join('\n');
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+    return;
+  }
   const unitNGN=calcUnit(p,CS.tier,CS.options,0),totalNGN=unitNGN*CS.quantity;
+  const selectedUnit=money(unitNGN,CS.currency),selectedTotal=money(totalNGN,CS.currency);
   const optLines=p.pricingModel==='layered'
     ?(p.pricedOptionGroups||[]).map(gr=>{const c=CS.options[gr.label];if(!c)return null;const opt=gr.options.find(o=>o.label===c);const add=opt?opt.costPrice*(1+(p.margin||0)/100):0;return`  • ${gr.label}: ${c}${add>0?' (+₦'+fmtN(add)+'/unit)':''}`;}).filter(Boolean)
     :[`  • Quality: ${(CS.tier||'').charAt(0).toUpperCase()+(CS.tier||'').slice(1)}`,...Object.entries(CS.options).map(([k,v])=>`  • ${k}: ${v}`)];
@@ -924,7 +1010,7 @@ function submitQuote(){
     `🖨️ *NEW PRINT QUOTE — PUREGOLD PRINTS*`,``,
     `👤 *Customer*`,`Name: ${name}`,`Phone: ${phone}`,`Email: ${email}`,``,
     `📋 *Quote*`,`Product: ${p.icon} ${p.name}`,...optLines,`Quantity: ${fmtN(CS.quantity)} units`,``,
-    `💰 *Pricing*`,`Unit (₦): ₦${fmtN(unitNGN)}`,`Unit ($): $${fmtN(unitNGN/rate,2)}`,`Total (₦): ₦${fmtN(totalNGN)}`,`Total ($): $${fmtN(totalNGN/rate,2)}`,``,
+    `💰 *Pricing*`,`Unit (NGN): ${money(unitNGN,'NGN')}`,`Total (NGN): ${money(totalNGN,'NGN')}`,CS.currency!=='NGN'?`Selected Currency: ${selectedUnit} per unit · ${selectedTotal} total`:null,``,
     notes?`📝 Notes: ${notes}`:null,``,`_Via Puregold Prints Quote Calculator_`
   ].filter(l=>l!==null).join('\n');
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
@@ -944,7 +1030,14 @@ function doLogin(){
   }else{err.style.display='block';}
 }
 
-function saveRate(){saveGlobal({exchangeRate:parseFloat(document.getElementById('rate-input').value)||1550});}
+function saveRate(){
+  const rates=defaultRates();
+  Object.keys(rates).forEach(code=>{
+    const input=document.getElementById('rate-'+code);
+    if(input)rates[code]=parseFloat(input.value)||rates[code];
+  });
+  saveGlobal({exchangeRate:rates.USD,rates});
+}
 
 function changePwd(){
   const v=document.getElementById('new-pwd').value.trim();
@@ -954,7 +1047,11 @@ function changePwd(){
 
 function renderAdmin(){
   const products=getProducts(),g=getGlobal();
-  document.getElementById('rate-input').value=g.exchangeRate||1550;
+  const rates=g.rates||defaultRates();
+  Object.keys(defaultRates()).forEach(code=>{
+    const input=document.getElementById('rate-'+code);
+    if(input)input.value=rates[code]||'';
+  });
   const list=document.getElementById('admin-list'),empty=document.getElementById('admin-empty');
   if(!products.length){list.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
